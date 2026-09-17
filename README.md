@@ -1,5 +1,8 @@
 # 论文双语对照阅读网页
 
+在线阅读：<https://howardzhangdqs.github.io/paper-bilingual/>（推送
+`main` 后由 GitHub Actions 自动构建部署）。
+
 Vite + Vue3 + TS 框架：左栏英文（Times New Roman）、右栏中文逐行对照，
 图片 / 表格 / 行间公式跨栏居中显示，KaTeX 渲染公式，左侧目录随滚动高亮，
 窄屏自动降级单栏。插图点击进入灯箱（原地飞入放大、滚轮锚点缩放、拖拽
@@ -11,7 +14,7 @@ Vite + Vue3 + TS 框架：左栏英文（Times New Roman）、右栏中文逐行
 用**写作组件**亲手编写模板源码（一篇论文一个文件夹，glob 自动发现）：
 
 ```
-web/src/papers/<id>/
+src/papers/<id>/
 ├── meta.ts          # 论文元信息（主页 eager 加载，独立于正文组件）
 ├── index.vue        # <PaperBody> 组装各章节组件（路由动态加载）
 ├── cites.json       # 文献编号（scripts/extract_cites.py 生成）
@@ -41,7 +44,6 @@ web/src/papers/<id>/
 ## 目录结构
 
 ```
-web/
 ├── scripts/
 │   ├── convert_figs.py   # figures/*.pdf -> public/figures/<id>/*.svg + *.png
 │   └── extract_cites.py  # main.bbl -> cites.json + references.json
@@ -57,10 +59,13 @@ web/
 └── public/figures/<id>/  # 论文图：SVG 矢量 + PNG 位图（灯箱动画替身）
 ```
 
-## 开发
+## 开发与部署
 
 ```bash
 npm install
 npm run dev      # 开发
 npm run build    # 构建到 dist/（base 为相对路径，可静态部署任意子目录）
 ```
+
+推送到 `main` 即自动构建并部署到 GitHub Pages
+（[.github/workflows/deploy.yml](.github/workflows/deploy.yml)）。
