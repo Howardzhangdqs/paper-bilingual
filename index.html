@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>论文双语对照阅读</title>
+    <script>
+      /* 防白闪：module 脚本要等 DOM 解析完才执行，暗色用户会先看到一帧
+         浅色页底。挂载前按持久化偏好预置 dark 类（与 settings.ts 同 key） */
+      try {
+        var p = JSON.parse(localStorage.getItem('reading-prefs') || '{}')
+        var dk = p.theme === 'dark' || (p.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+        if (dk) document.documentElement.classList.add('dark')
+      } catch (e) { /* ignore */ }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

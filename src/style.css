@@ -1,0 +1,1133 @@
+:root {
+  --en-font: 'Times New Roman', 'Liberation Serif', 'Tinos', Times, serif;
+  --zh-font: 'Times New Roman', 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif;
+  --ink: #1a1a1a;
+  --ink-soft: #333;
+  --muted: #667;
+  --accent: #0b3d91;
+  --line: #d8d8de;
+  --bg: #fdfdfc;
+  /* 面板/浮层/卡片底色（浮层、目录、题注卡、论文卡） */
+  --panel: #fff;
+  --topbar-bg: rgba(253, 253, 252, 0.7);
+  --fab-bg: rgba(255, 255, 255, 0.94);
+  /* 主题色的透明度梯度：浅底(hover)、稍深底(选中/按钮底)、蓝边框、点线下划线 */
+  --accent-weak: rgba(11, 61, 145, 0.08);
+  --accent-soft: rgba(11, 61, 145, 0.11);
+  --accent-line: rgba(11, 61, 145, 0.28);
+  --accent-dim: rgba(11, 61, 145, 0.38);
+  --strong-line: #444;
+  --td-line: #e4e4ea;
+  --toc-no: #98a0b0;
+  --icon: #7b7b88;
+  --col-label: #b8b8c0;
+  --code-bg: #f2f2f5;
+  --tip-bg: #f7f8fb;
+  --tip-border: #e3e6ee;
+  --tip-dash: #e6e8f0;
+  --frozen-a: #f3f3f6;
+  --frozen-b: #ececf1;
+  --ok: #1d9e55;
+  --err: #b00;
+  --unknown-bg: rgba(255, 200, 200, 0.25);
+}
+
+/* 暗色主题：仅覆盖变量，规则全部引用变量（阅读设置面板切换，
+   settings.ts 同步 html.dark；内联脚本在挂载前预置防白闪） */
+html.dark {
+  color-scheme: dark;
+  --ink: #e6e4df;
+  --ink-soft: #c6c4bf;
+  --muted: #9aa0ab;
+  --accent: #8ab0ff;
+  --line: #34383f;
+  --bg: #15171b;
+  --panel: #1e2126;
+  --topbar-bg: rgba(21, 23, 27, 0.72);
+  --fab-bg: rgba(30, 33, 38, 0.94);
+  --accent-weak: rgba(138, 176, 255, 0.14);
+  --accent-soft: rgba(138, 176, 255, 0.22);
+  --accent-line: rgba(138, 176, 255, 0.38);
+  --accent-dim: rgba(138, 176, 255, 0.55);
+  --strong-line: #8b9099;
+  --td-line: #33373e;
+  --toc-no: #71767f;
+  --icon: #8b9099;
+  --col-label: #5b606a;
+  --code-bg: #272b31;
+  --tip-bg: #23262c;
+  --tip-border: #3a3f47;
+  --tip-dash: #33373e;
+  --frozen-a: #23262c;
+  --frozen-b: #1d2025;
+  --ok: #4cc987;
+  --err: #ff8080;
+  --unknown-bg: rgba(255, 130, 130, 0.16);
+}
+
+/* 暗色下的论文插图：默认反色。SVG 图自带白色背景矩形，若用 invert(1)
+   会反成纯黑块；这里取 invert(0.91)——白底反色后约 #151515，与页底
+   #15171b 几乎一致，图片底与页面无缝衔接。不用 mix-blend-mode: screen
+   （它会把线稿抗锯齿的中间调像素提亮成白色光晕）。hue-rotate 让彩色
+   线条反明度后保持原色相。设置面板可单独关闭反色，关闭时图片保持
+   原样。灯箱（Teleport 到 body）同步，与正文观感一致 */
+html.dark.invert-fig .figure-block img {
+  filter: invert(0.91) hue-rotate(180deg);
+}
+html.dark.invert-fig .lightbox img {
+  filter: invert(0.91) hue-rotate(180deg);
+}
+/* filter 会连灯箱的黑色投影一起反转，变成图片四周的白色光晕：反色时
+   直接撤掉投影，图片与深色遮罩自然融合（特异性需盖过组件 scoped 的
+   .lightbox img.ready）；不加边线——任何亮于底色的描边都会显成一圈白边 */
+html.dark.invert-fig .lightbox img.ready {
+  box-shadow: none;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--en-font);
+  font-size: 17px;
+  line-height: 1.62;
+  /* UI 区域（顶栏/目录/按钮等）文字禁选，防误触；内容区在下方放开 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 可选中文字的内容区：论文正文（含图表公式题注/参考文献）与悬停
+   卡片（公式符号释义、链接预览） */
+.paper-body,
+.formula-tip,
+.ref-tip {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#app { min-height: 100vh; }
+
+/* sticky 页头下锚点跳转不被遮挡（注意：scroll-padding 会与元素自身的
+   scroll-margin 叠加，这里只用元素的 scroll-margin-top，勿再设本属性） */
+.heading-row, .full-block { scroll-margin-top: 70px; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------- 页面骨架 ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 22px;
+  background: var(--topbar-bg);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+  /* 沉浸式收起/展开动画（高度收拢滑出） */
+  max-height: 60px;
+  overflow: hidden;
+  transition:
+    max-height 0.28s ease,
+    padding 0.28s ease,
+    opacity 0.28s ease,
+    border-bottom-color 0.28s ease;
+}
+.topbar .brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  /* 收起动画容器：1fr→0fr 轨道过渡让宽度随文字精确塌缩，配合淡出；
+     收起后负 margin 抵消自身参与的那份顶栏 gap，标题无缝左移补位 */
+  display: inline-grid;
+  grid-template-columns: 1fr;
+  transition:
+    grid-template-columns 0.45s ease,
+    opacity 0.45s ease,
+    margin-right 0.45s ease;
+}
+/* 内层裁剪：随轨道收窄逐字吞没；overflow 非 visible 同时把 grid item
+   的自动最小尺寸归零，轨道才收得到 0fr */
+.topbar .brand > span { overflow: hidden; white-space: nowrap; }
+.topbar .brand:hover { text-decoration: none; }
+/* 标题区滚出视口后：站名收拢淡出让位，旁侧 paper-name 接棒为主标题。
+   visibility 延迟到动画播完再生效，反向展开时则立即恢复可点 */
+.topbar .brand.collapsed {
+  grid-template-columns: 0fr;
+  opacity: 0;
+  margin-right: -18px;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    grid-template-columns 0.45s ease,
+    opacity 0.45s ease,
+    margin-right 0.45s ease,
+    visibility 0s 0.45s;
+}
+.topbar .paper-name {
+  color: var(--muted);
+  font-size: 14.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.45s ease, font-size 0.45s ease, font-weight 0.45s ease;
+}
+/* 站名收起后论文标题提亮为主墨色（暗色主题下即变白）、放大加粗 */
+.topbar .paper-name.as-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+/* 中文标题与站名同款 1fr⇄0fr 收放：英文标题放大时同步展开补位 */
+.topbar .paper-name .zh {
+  display: inline-grid;
+  grid-template-columns: 0fr;
+  margin-left: 0;
+  opacity: 0;
+  transition:
+    grid-template-columns 0.45s ease,
+    opacity 0.45s ease,
+    margin-left 0.45s ease;
+}
+.topbar .paper-name .zh > span {
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--zh-font);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.topbar .paper-name.as-title .zh {
+  grid-template-columns: 1fr;
+  margin-left: 7px;
+  opacity: 1;
+}
+/* 顶栏当前章节名：与站名/中文标题同款 1fr⇄0fr 收放——标题接棒时窗口
+   宽度从 0 展开（首个章节名因此有宽度出现动画），换章时窗口内新名沿
+   滚动方向顶入顶掉旧名。与分隔符的间距放在内层 span 的 margin 上
+   （绝对定位的离场项同样生效，顶走瞬间不会向分隔符跳位） */
+.topbar .topbar-section {
+  position: relative; /* 离场章节名的绝对定位包含块 */
+  display: inline-grid;
+  grid-template-columns: 0fr;
+  min-width: 0;
+  height: 1.4em;
+  overflow: hidden;
+  border-left: 1px solid var(--line);
+  margin-right: -18px; /* 收起时抵消自身参与的那份顶栏 gap */
+  font-size: 13.5px;
+  color: var(--muted);
+  opacity: 0;
+  transition:
+    grid-template-columns 0.45s ease,
+    opacity 0.45s ease,
+    margin-right 0.45s ease;
+}
+.topbar .topbar-section.shown {
+  grid-template-columns: 1fr;
+  margin-right: 0;
+  opacity: 1;
+}
+.topbar .topbar-section > span {
+  display: block;
+  line-height: 1.4em;
+  margin-left: 14px;
+  overflow: hidden;
+  white-space: nowrap;
+  /* 不用 ellipsis：展开/换章动画中窗口宽度瞬态小于文本，省略号会
+     在移动边缘闪现；这里宁可在动画期间硬裁切 */
+}
+/* 换章方向过渡：fwd = 向后翻章（下滚），新名自下顶入、旧名向上离场；
+   back = 向前翻章（上滚），相反。离场项绝对定位与入场项重叠，窗口内对推 */
+.sec-fwd-enter-active,
+.sec-fwd-leave-active,
+.sec-back-enter-active,
+.sec-back-leave-active { transition: transform 0.3s ease, opacity 0.3s ease; }
+.sec-fwd-enter-from { transform: translateY(105%); opacity: 0; }
+.sec-fwd-leave-to { transform: translateY(-105%); opacity: 0; }
+.sec-back-enter-from { transform: translateY(-105%); opacity: 0; }
+.sec-back-leave-to { transform: translateY(105%); opacity: 0; }
+.sec-fwd-leave-active,
+.sec-back-leave-active { position: absolute; inset: 0; }
+/* 高速换章档：连续换章（目录跳转的飞行途中、快速滚掠）时缩短顶替
+   动画，只覆盖时长，方向仍由 sec-fwd / sec-back 决定 */
+.topbar-section.fast .sec-fwd-enter-active,
+.topbar-section.fast .sec-fwd-leave-active,
+.topbar-section.fast .sec-back-enter-active,
+.topbar-section.fast .sec-back-leave-active { transition-duration: 0.12s; }
+.topbar .spacer { flex: 1; }
+/* 顶栏“进入沉浸式”按钮（仅论文页显示，App.vue 控制） */
+.topbar .immersive-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--icon);
+  cursor: pointer;
+}
+.topbar .immersive-btn:hover { background: var(--accent-weak); color: var(--accent); }
+.topbar .immersive-btn svg { width: 17px; height: 17px; }
+
+/* ---------- 沉浸式阅读模式 ---------- */
+/* 顶栏隐藏、正文单列占满；目录收为左下角圆钮 + 浮层（.toc.open）。
+   html.immersive 由 App.vue 按路由同步，窄屏默认开启（immersive.ts） */
+/* 收起态：高度收拢 + 淡出（sticky 占位随高度归零）。目录列的收放
+   动画与正文列位的固定均在下方宽屏媒体查询内（窄屏恒为单列，不存在
+   目录列） */
+html.immersive .topbar {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  border-bottom-color: transparent;
+  pointer-events: none;
+}
+
+/* 宽屏（有目录侧栏列）的沉浸切换：目录所在 grid 首列平滑收缩到 0
+   （track 尺寸与 gap 均可插值）。正文显式固定第 2 列——目录沉浸脱流
+   （fixed 浮层）后不会被自动放置进收缩中的空首列，且宽度随收放平滑
+   变化。窄屏恒为单列（见 max-width: 980px 媒体查询），不涉及这些 */
+@media (min-width: 981px) {
+  .paper-layout > main { grid-column: 2; }
+  html.immersive .paper-layout { grid-template-columns: 0px minmax(0, 1fr); gap: 0; }
+}
+html.immersive .heading-row,
+html.immersive .full-block { scroll-margin-top: 16px; }
+
+/* 进入/退出沉浸的切换帧，App.vue 会临时加上本类：.toc 从侧栏（宽屏）或
+   折叠标题（窄屏）跨到浮层样式时，若按下面的 opacity/transform 过渡
+   播放，目录会在左下角闪现一下——切换瞬间须无过渡直达目标样式 */
+html.immersive-jump .toc { transition: none !important; }
+
+/* 沉浸时侧栏目录隐藏，点圆钮后以浮层展开：浮层为纵向 flex（头部固定
+   在滚动区外，仅列表 <ol> 滚动——滚动条不经过头部）；展开与收起都是
+   过渡动画（自左下圆钮方向缩放滑入/滑出）——visibility 参与过渡，
+   离场动画播完才真正隐藏 */
+html.immersive .toc {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 18px;
+  bottom: 74px; /* 紧贴圆钮上方（钮顶 68px + 6px 间隙） */
+  top: auto; /* 覆盖侧栏 sticky 的 top: 64px——与 bottom 过约束时会顶掉贴底定位 */
+  z-index: 95; /* 低于灯箱(100) */
+  width: min(380px, calc(100vw - 36px));
+  max-height: min(72vh, 600px);
+  overflow: hidden;
+  padding: 12px 16px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: 0 10px 40px rgba(20, 30, 60, 0.18);
+  transform-origin: 24px calc(100% + 30px); /* 圆钮中心，动画从钮上弹出 */
+  opacity: 0;
+  transform: translateY(14px) scale(0.96);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.22s cubic-bezier(0.2, 0.8, 0.3, 1),
+    transform 0.22s cubic-bezier(0.2, 0.8, 0.3, 1),
+    visibility 0.22s;
+}
+html.immersive .toc.open {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+}
+html.immersive .toc ol {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 4px;
+}
+/* 沉浸式浮层是有底色的圆角卡片，不渐隐（渐变到页底色会穿帮） */
+html.immersive .toc::after { content: none; }
+html.immersive .toc .toc-title { display: none; }
+html.immersive .toc .toc-toggle { display: none; }
+
+/* 浮层头部：标题 + 退出沉浸（仅沉浸浮层中显示），位于滚动区外 */
+.toc-float-head {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: none;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+html.immersive .toc .toc-float-head { display: flex; }
+.toc-float-head .t { font-weight: 700; font-size: 14px; color: var(--ink); }
+.toc-float-head .exit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-family: var(--zh-font);
+  cursor: pointer;
+}
+.toc-float-head .exit:hover { color: var(--accent); border-color: var(--accent-line); }
+.toc-float-head .exit svg { width: 13px; height: 13px; }
+
+/* 左下角目录圆钮（沉浸时显示，PaperBody 渲染） */
+.toc-fab {
+  position: fixed;
+  left: 18px;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  z-index: 95; /* 低于灯箱(100) */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--accent-line);
+  border-radius: 50%;
+  background: var(--fab-bg);
+  backdrop-filter: blur(6px);
+  color: var(--accent);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+.toc-fab:hover { background: var(--panel); box-shadow: 0 4px 20px rgba(15, 23, 42, 0.26); }
+.toc-fab svg { width: 22px; height: 22px; }
+
+/* 沉浸式时左下角常驻的阅读设置钮（SettingsFab）右移，与目录圆钮并排 */
+html.immersive .settings-wrap {
+  left: 76px; /* 18 + 48(目录圆钮) + 10 间隙 */
+}
+
+.paper-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 28px;
+  max-width: 1560px;
+  margin: 0 auto;
+  /* padding: 26px 26px 80px; */
+  /* 沉浸式切换：首列（目录）宽与 gap 平滑收放（列位规则见宽屏
+     媒体查询） */
+  transition: grid-template-columns 0.28s ease, gap 0.28s ease;
+}
+
+/* ---------- 目录 ---------- */
+
+.toc {
+  position: sticky;
+  top: 64px;
+  align-self: start;
+  max-height: calc(100vh - 70px);
+  /* 纵向 flex：「目录」标题固定在滚动区外，仅列表 <ol> 滚动
+     （滚动条不经过标题，与沉浸浮层同构） */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-size: 13.5px;
+  line-height: 1.45;
+  padding-right: 6px;
+}
+.toc .toc-title { flex: none; font-weight: 700; font-size: 14px; margin-bottom: 8px; color: var(--ink); }
+.toc ol {
+  list-style: none;
+  margin: 0;
+  /* 底部预留不小于渐隐区高度的 padding，滚到底时末条目完整可读 */
+  padding: 0 0 72px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* 细滚动条：thumb 用边框色低调融入，悬停加深一档 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.toc ol::-webkit-scrollbar { width: 6px; }
+.toc ol::-webkit-scrollbar-track { background: transparent; }
+.toc ol::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+.toc ol::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+.toc li { margin: 3px 0; }
+/* 目录底部渐隐：左下角常驻设置钮悬浮在这个区域上，渐隐既暗示内容延续，
+   又避免生硬的截断感。ol 预留等高 padding，滚到底时末条目仍在渐隐区外
+   完整可读（沉浸式浮层与窄屏折叠卡不渐隐，见下方两处 content: none） */
+.toc::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 72px;
+  background: linear-gradient(180deg, transparent, var(--bg));
+  pointer-events: none;
+}
+.toc a { color: var(--muted); display: block; border-left: 2px solid transparent; padding-left: 8px; }
+.toc a:hover { color: var(--accent); text-decoration: none; }
+.toc a .toc-no {
+  display: inline-block;
+  min-width: 2.4em;
+  font-family: var(--en-font);
+  font-weight: 600;
+  color: var(--toc-no);
+}
+.toc a.lvl-1 { font-weight: 600; color: var(--ink-soft); }
+.toc a.lvl-1 .toc-no { color: var(--accent); }
+.toc a.lvl-2 { padding-left: 30px; }
+.toc a.lvl-2 .toc-no { font-weight: 400; }
+.toc a.lvl-3 { padding-left: 44px; }
+.toc a.router-link-active, .toc a.current { border-left-color: var(--accent); color: var(--accent); }
+
+/* ---------- 论文标题区 ---------- */
+
+.paper-header { text-align: center; margin: 14px 0 30px; }
+.paper-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+.paper-header .zh-title { font-family: var(--zh-font); font-size: 21px; font-weight: 700; color: var(--ink-soft); margin-bottom: 12px; }
+.paper-header .authors { font-size: 15px; color: var(--muted); }
+.paper-header .venue { font-size: 13.5px; color: var(--muted); margin-top: 4px; }
+.paper-header .venue a { margin-left: 8px; }
+
+/* ---------- 双栏对照行 ---------- */
+
+.pair-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 44px;
+  align-items: start;
+  padding: 7px 0;
+}
+.pair-row .en-col { font-family: var(--en-font); text-align: justify; hyphens: auto; }
+.pair-row .zh-col { font-family: var(--zh-font); text-align: justify; }
+/* 列最小宽度 0 + 放不下时断词：正文里的长 URL 等不可断串在回退字体下
+   min-content 可能超过列宽，把 grid 轨道撑破、行尾字符被裁 */
+.pair-row .en-col, .pair-row .zh-col {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.pair-row .col-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--col-label);
+  font-family: var(--en-font);
+  display: block;
+  margin-bottom: 1px;
+}
+
+/* 段落 */
+.para p { margin: 0 0 10px; }
+.para p:last-child { margin-bottom: 0; }
+.lead { font-weight: 700; margin-right: 0.5em; }
+
+/* 章节标题（双栏） */
+.heading-row { margin-top: 26px; padding-top: 6px; }
+.heading-row.lvl-1 {
+  border-top: 1px solid var(--line);
+  margin-top: 34px;
+}
+.heading-row .en-col { font-size: 21px; font-weight: 700; line-height: 1.35; }
+.heading-row.lvl-2 .en-col { font-size: 18px; }
+.heading-row.lvl-3 .en-col { font-size: 16.5px; font-style: italic; font-weight: 600; }
+.heading-row .zh-col { font-size: 19px; font-weight: 700; line-height: 1.4; }
+.heading-row.lvl-2 .zh-col { font-size: 17px; }
+.heading-row.lvl-3 .zh-col { font-size: 16px; font-weight: 600; }
+
+/* ---------- 跨栏共享素材 ---------- */
+
+.full-block {
+  grid-column: 1 / -1;
+  margin: 22px auto;
+  padding: 14px 0;
+  border-top: 1px dashed var(--line);
+  border-bottom: 1px dashed var(--line);
+}
+/* 分隔线排布：相邻跨栏块（图/表/公式）合并为一个视觉区，块间不画线；
+   跨栏块紧邻一级章节标题时让位给标题上方的实线，避免虚线+实线并存 */
+.full-block + .full-block {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 6px;
+}
+.full-block:has(+ .full-block) {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 6px;
+}
+.full-block:has(+ .heading-row.lvl-1) {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* 图 */
+.figure-block { text-align: center; }
+.figure-block img, .figure-block svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}
+.figure-block img.zoomable { cursor: zoom-in; }
+.figure-block .caption {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 44px;
+  margin-top: 10px;
+  text-align: justify;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.figure-block .caption .en-cap { font-family: var(--en-font); }
+.figure-block .caption .zh-cap { font-family: var(--zh-font); }
+.figure-block .fig-no { font-weight: 700; }
+
+/* 行间公式（左为释义面板、右为占满剩余宽度的公式列，公式列内居中） */
+.equation-block {
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: visible;
+}
+/* 窄屏面板改为上下排；横向滚动只作用于公式列——工具按钮与释义面板
+   固定不动，不会随公式一起被滚出视野 */
+@media (max-width: 980px) {
+  .equation-block {
+    flex-direction: column;
+  }
+  .eq-formulas {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  /* 公式过长时保证从左起可滚到最右（safe center：放得下时居中，
+     放不下时退化为起点对齐，避免居中溢出导致两端滚不到） */
+  .eq-formulas .katex-display {
+    display: flex;
+    align-items: center;
+    justify-content: safe center;
+  }
+  .eq-tips-wrap.open { margin-right: 0; margin-bottom: 10px; }
+  .eq-tips { max-width: 100%; }
+}
+/* 组内公式列：连续公式合并为一个块后，各成员公式在右侧垂直排列 */
+.eq-formulas {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.eq-formula-row { display: flex; align-items: center; }
+.eq-formula { flex: 1; }
+.eq-formula-row .eq-no {
+  margin-left: 10px;
+  font-family: var(--en-font);
+  color: var(--ink);
+}
+.katex-display { margin: 0 !important; }
+.katex { font-size: 1.06em; }
+
+/* 公式块右上角工具按钮：收起/展开释义 / 复制 LaTeX */
+.eq-tools {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  display: flex;
+  gap: 2px;
+  opacity: 0.28;
+  transition: opacity 0.15s;
+  z-index: 2;
+}
+.equation-block:hover .eq-tools,
+.eq-tools:focus-within { opacity: 1; }
+/* 没有展开释义面板的块较矮，右上角按钮会与公式编号重叠：仅悬停时浮现 */
+.equation-block:not(:has(.eq-tips-wrap.open)):not(:hover) .eq-tools { opacity: 0; }
+.eq-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--icon);
+  cursor: pointer;
+}
+.eq-btn svg { width: 15px; height: 15px; display: block; }
+.eq-btn:hover { background: var(--accent-weak); color: var(--accent); }
+.eq-btn.on { background: var(--accent-soft); color: var(--accent); }
+.eq-btn.ok { color: var(--ok); }
+
+/* 释义面板：置于公式左侧，宽度随内容。
+   性能：不做任何逐帧布局动画（列宽/行高的每帧变化都会引发 KaTeX
+   内容测量或整页文档流重排，导致卡顿）——尺寸随 class 一次到位，
+   公式位移由 Equation 内的 FLIP 补间；面板自身用 clip-path 揭示 +
+   淡入 + 轻微位移（合成器动画，60fps）。
+   折叠层不含 padding/border（否则收起时残留），样式放最内层 */
+.eq-tips-wrap {
+  display: grid;
+  grid-template-columns: 0fr;
+  grid-template-rows: 0fr;
+  /* 高度平滑展开：行高过渡（内容高度恒定，仅裁剪区与块高变化） */
+  transition: grid-template-rows 0.3s ease;
+}
+.eq-tips-wrap.open {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  margin-right: 32px;
+}
+.eq-tips-clip {
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+/* 释义内容：表格化布局——符号列各行等宽（取最宽符号）、符号居左 */
+.eq-tips {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 14px;
+  width: max-content;
+  max-width: min(480px, 46vw);
+  padding: 7px 16px;
+  background: var(--tip-bg);
+  border: 1px solid var(--tip-border);
+  border-radius: 8px;
+  font-family: var(--zh-font);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  opacity: 0;
+  clip-path: inset(-1px 101% -1px -1px round 9px);
+  transform: translateX(-10px);
+  transition: clip-path 0.3s ease, opacity 0.22s ease, transform 0.3s ease;
+}
+.eq-tips-wrap.open .eq-tips {
+  opacity: 1;
+  clip-path: inset(-1px -1px -1px -1px round 9px);
+  transform: none;
+}
+.eq-tip-row { display: contents; }
+.eq-tip-sym {
+  color: var(--accent);
+  text-align: left;
+  white-space: nowrap;
+  padding: 2px 0;
+}
+.eq-tip-sym .katex { font-size: 1.02em; }
+.eq-tip-text { text-align: left; padding: 2px 0; }
+
+/* 正文最小宽度 0：阻断内容最小宽度撑破 grid 轨道（见窄屏注释） */
+.paper-body { min-width: 0; }
+
+/* 正文块按需渲染：视口外的段落/图表公式块跳过布局与绘制，
+   减小公式块高度动画等重排的代价（浏览器原生“虚拟渲染”） */
+.paper-body .pair-row,
+.paper-body .full-block,
+.paper-body .list-block {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+}
+
+/* 渐进挂载哨兵：未挂载章节的占位（进入视口下方预判范围即挂载下一批）。
+   高度取约一屏半，滚动条比例大致正确且留足挂载提前量 */
+.mount-sentinel {
+  height: 150vh;
+}
+
+/* 页内跳转：滚动途中被冻结的块（content-visibility: hidden，占位高度
+   已锁定为真实尺寸）显示为浅灰骨架占位；起点/终点视口附近保持实化 */
+.paper-body .cv-frozen {
+  background: linear-gradient(180deg, var(--frozen-a) 0%, var(--frozen-b) 100%);
+  border-radius: 4px;
+}
+
+/* 公式符号悬停释义：带释义的符号标浅色点线，悬停加深。
+   KaTeX 上下标的 vlist 结构盒会拦截指针命中（内容从 height:0 条目
+   溢出渲染），导致下标符号 hover 不到——结构层穿透、符号恢复命中 */
+.katex [data-tip] {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--accent-dim);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  border-radius: 2px;
+  pointer-events: auto;
+  transition: background-color 0.12s, text-decoration-color 0.12s;
+}
+.katex .vlist, .katex .pstrut { pointer-events: none; }
+.katex [data-tip]:hover {
+  text-decoration-color: var(--accent);
+  background-color: var(--accent-weak);
+}
+
+/* 释义卡片（TipLayer，Teleport 到 body） */
+.formula-tip {
+  position: fixed;
+  z-index: 1300;
+  max-width: min(360px, calc(100vw - 24px));
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  background: var(--panel);
+  border: 1px solid var(--tip-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 18px rgba(20, 30, 60, 0.14);
+  padding: 7px 12px;
+  font-family: var(--zh-font);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+.formula-tip .tip-sym {
+  flex: none;
+  color: var(--accent);
+  font-size: 14.5px;
+}
+.formula-tip .tip-sym .katex { font-size: 1em; }
+.formula-tip .tip-text { text-align: left; }
+/* 悬停卡片出入场（Vue Transition，TipLayer/RefTipLayer 共用）：
+   淡入淡出 + 轻微上浮位移，离场同样有过渡 */
+.tip-fade-enter-active,
+.tip-fade-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.tip-fade-enter-from,
+.tip-fade-leave-to {
+  opacity: 0;
+  transform: translateY(3px);
+}
+@keyframes tip-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 链接悬停预览卡（RefTipLayer）：式/图/表/章节引用与文献条目的摘要 */
+.ref-tip {
+  position: fixed;
+  z-index: 1300;
+  max-width: min(560px, calc(100vw - 24px));
+  background: var(--panel);
+  border: 1px solid var(--tip-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 18px rgba(20, 30, 60, 0.14);
+  padding: 8px 12px 11px;
+  font-family: var(--zh-font);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  /* 可交互：鼠标移入卡片不隐藏（移出卡片才消失，见 refPreview 的延迟
+     隐藏机制）——卡片内链接/文字可选择，代价是遮挡其下方内容 */
+  pointer-events: auto;
+}
+.ref-tip .ref-tip-head {
+  display: flex;
+  /* 图标 svg 无文本基线，baseline 对齐会使其底边贴文字基线而整体偏上；
+     center 让箭头与标题的视觉中心对齐 */
+  align-items: center;
+  gap: 7px;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.ref-tip .dir {
+  display: inline-flex;
+  align-items: center;
+}
+.ref-tip .dir svg { width: 13px; height: 13px; }
+.ref-tip .ref-tip-body { text-align: left; max-height: 220px; overflow: hidden; }
+.ref-tip .ref-tip-body:not(.rich) { white-space: pre-line; }
+/* 克隆进卡的题注/公式：收敛原块里的大间距 */
+.ref-tip .ref-tip-body .cap-line + .cap-line { color: var(--muted); margin-top: 2px; }
+.ref-tip .ref-tip-body .cap-line .fig-no { font-weight: 700; }
+.ref-tip .ref-tip-body .katex-display { margin: 4px 0; text-align: left; }
+.ref-tip .ref-tip-body .katex-display > .katex { font-size: 1.02em; }
+/* 触摸设备两段式的「点我跳转」按钮（仅 hover:none 显示；桌面悬停
+   未设 jumpAction，不渲染） */
+.ref-tip-jump { display: none; }
+@media (hover: none) {
+  .ref-tip-jump {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 6px 0;
+    border: 1px solid var(--accent-line);
+    border-radius: 7px;
+    background: var(--accent-weak);
+    color: var(--accent);
+    font-family: var(--zh-font);
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .ref-tip-jump:hover { background: var(--accent-soft); }
+}
+
+/* 图标（@iconify/vue，Material Symbols）：13~15px 小尺寸下默认字重视觉
+   偏细——currentColor 描边沿填充外扩加粗一档（paint-order 使描边垫底） */
+svg.iconify {
+  paint-order: stroke;
+  stroke: currentColor;
+  stroke-width: 0.7px;
+  flex-shrink: 0;
+}
+
+/* 表格 */
+.table-block { overflow-x: auto; }
+.table-block .caption {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 44px;
+  margin-bottom: 8px;
+  text-align: justify;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.table-block table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+.table-block th {
+  font-family: var(--en-font);
+  font-weight: 700;
+  border-top: 1.6px solid var(--strong-line);
+  border-bottom: 1.2px solid var(--strong-line);
+  padding: 5px 10px;
+}
+.table-block td {
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--td-line);
+  font-family: var(--en-font);
+}
+.table-block tr:last-child td { border-bottom: 1.6px solid var(--strong-line); }
+.table-block td.zh { font-family: var(--zh-font); }
+
+/* 列表（双栏逐项对照） */
+.list-block .pair-row { padding: 4px 0; }
+.list-block ol, .list-block ul { margin: 0; padding-left: 24px; list-style: decimal; }
+.list-block ul { list-style: disc; }
+.list-block li { margin: 6px 0; }
+.list-block .li-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 44px;
+}
+.list-block .li-grid .zh-col { font-family: var(--zh-font); }
+
+/* 引用与脚注：与公式带释义符号（.katex [data-tip]）一致的点线下划线，
+   悬停加深并衬浅蓝底。文献上标仅数字（.cite-n）带线——方括号与逗号
+   不带；脚注 † 同款（无跳转目标，悬停显示脚注内容预览）；上标字号
+   小，下划线偏移收窄一档 */
+a.ref,
+sup.cite .cite-n,
+sup.footnote {
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--accent-dim);
+  border-radius: 2px;
+  transition: background-color 0.12s, text-decoration-color 0.12s;
+}
+a.ref { text-underline-offset: 3px; }
+sup.cite .cite-n,
+sup.footnote { text-underline-offset: 2px; }
+a.ref:hover,
+sup.cite .cite-n:hover,
+sup.footnote:hover {
+  text-decoration-color: var(--accent);
+  background-color: var(--accent-weak);
+}
+sup.cite { font-size: 0.72em; letter-spacing: 0.02em; }
+sup.footnote { font-size: 0.75em; }
+.unknown-cmd { color: var(--err); background: var(--unknown-bg); border-bottom: 1px dotted var(--err); }
+
+/* 引用跳转落点的高亮闪烁 */
+@keyframes jump-flash-kf {
+  0% { background: rgba(255, 213, 79, 0.55); }
+  100% { background: transparent; }
+}
+.jump-flash { animation: jump-flash-kf 1.4s ease-out; }
+
+/* 参考文献 */
+.references { margin-top: 30px; }
+.references .ref-list {
+  font-size: 14.5px;
+  line-height: 1.5;
+  padding-left: 26px;
+}
+.references .ref-list li {
+  margin: 5px 0;
+  color: var(--ink-soft);
+  text-align: justify;
+}
+code { font-family: 'Consolas', 'Menlo', monospace; font-size: 0.88em; background: var(--code-bg); padding: 1px 4px; border-radius: 3px; }
+.math-error { color: var(--err); }
+
+/* ---------- 首页 ---------- */
+
+.home {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+.home h1 { font-size: 30px; margin: 0 0 8px; }
+.home .sub { color: var(--muted); margin-bottom: 36px; }
+.paper-card {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  background: var(--panel);
+  color: var(--ink);
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.paper-card:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+  box-shadow: 0 3px 14px rgba(11, 61, 145, 0.10);
+}
+.paper-card .id { font-size: 13px; color: var(--muted); letter-spacing: 0.04em; }
+.paper-card .t { font-size: 19px; font-weight: 700; margin: 4px 0 2px; }
+.paper-card .tz { font-family: var(--zh-font); font-size: 16px; color: var(--ink-soft); }
+.paper-card .meta { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
+
+/* ---------- 响应式：窄屏单栏 ---------- */
+
+.toc-toggle { display: none; }
+
+@media (max-width: 980px) {
+  /* minmax(0,·)：content-visibility 块恢复占位时 contain-intrinsic-size 的
+     双轴语法会把块高同时记为固有宽度，1fr（=minmax(auto,·)）会被这个
+     最小内容宽度撑破轨道、撑出横向滚动；下限 0 阻断传导 */
+  .paper-layout { grid-template-columns: minmax(0, 1fr); padding: 0 20px 70px; }
+  .heading-row, .full-block { scroll-margin-top: 56px; }
+  .toc { position: static; max-height: none; order: -1; border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: var(--panel); }
+  /* 窄屏目录是有底色的折叠卡片，不渐隐 */
+  .toc::after { content: none; }
+  .toc ol { padding-bottom: 0; }
+  /* 窄屏目录默认收起为一个标题按钮，点击展开（.open） */
+  .toc-title { display: none; }
+  .toc ol { display: none; }
+  .toc.open ol { display: block; margin-top: 8px; }
+  .toc-toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    border: none;
+    background: transparent;
+    padding: 2px 2px 0;
+    font: inherit;
+    font-family: var(--zh-font);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .toc-toggle svg { width: 14px; height: 14px; color: var(--toc-no); transition: transform 0.18s ease; }
+  .toc.open .toc-toggle svg { transform: rotate(180deg); }
+  /* 手机版锁定沉浸式：浮层头部不放退出按钮（窄屏默认沉浸且无退出入口） */
+  html.immersive .toc .toc-float-head .exit { display: none; }
+  .pair-row { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+  .figure-block .caption, .table-block .caption { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+  .figure-block .caption .en-cap, .figure-block .caption .zh-cap,
+  .table-block .caption .en-cap, .table-block .caption .zh-cap { min-width: 0; overflow-wrap: break-word; }
+  .list-block .li-grid { grid-template-columns: minmax(0, 1fr); }
+  .heading-row .zh-col { font-size: 17px; }
+}
+
+/* 触屏无悬停：公式工具按钮常显（覆盖桌面 hover 渐显逻辑），并脱离
+   悬浮定位改为独占一行——绝对定位会盖住最右侧的公式编号/公式尾部 */
+@media (hover: none) {
+  .equation-block .eq-tools,
+  .equation-block:not(:has(.eq-tips-wrap.open)):not(:hover) .eq-tools {
+    position: static;
+    align-self: flex-end;
+    padding-bottom: 2px;
+    opacity: 0.9;
+  }
+}
+
+/* ---------- 响应式：手机 ---------- */
+
+@media (max-width: 640px) {
+  .topbar { padding: 8px 14px; gap: 10px; }
+  .topbar .brand { font-size: 16.5px; }
+  .topbar .brand.collapsed { margin-right: -10px; }
+  .topbar .paper-name { font-size: 13px; }
+  .topbar .paper-name.as-title { font-size: 15px; }
+  .topbar .paper-name .zh > span { font-size: 12.5px; }
+  .topbar .paper-name.as-title .zh { margin-left: 5px; }
+  .topbar .topbar-section { font-size: 12.5px; margin-right: -10px; }
+  .topbar .topbar-section.shown { margin-right: 0; }
+  .topbar .topbar-section > span { margin-left: 10px; }
+  .paper-layout { padding: 0 16px 64px; }
+  .paper-header { margin: 10px 0 22px; }
+  .paper-header h1 { font-size: 22px; }
+  .paper-header .zh-title { font-size: 18px; }
+  .heading-row .en-col { font-size: 19px; }
+  /* 两端对齐在窄列会拉出大空隙（en 列的 hyphens 因 html lang=zh-CN 并不
+     生效），改左对齐 */
+  .pair-row .en-col, .pair-row .zh-col,
+  .figure-block .caption, .table-block .caption,
+  .references .ref-list li { text-align: left; }
+  /* 论文图缩窄后按百分比宽度会过小：手机上占满栏宽（SVG 矢量无损） */
+  .figure-block img { min-width: 100%; }
+  .home { padding: 36px 18px 64px; }
+  .home h1 { font-size: 26px; }
+}
+
+/* ---------- 显示语言切换 ---------- */
+/* 左下角设置面板（SettingsFab）三选一：双语（默认，无类）/ 仅英文
+   （html.lang-only-en）/ 仅中文（html.lang-only-zh），settings.ts 把类
+   同步到 <html>。藏掉另一侧栏后把各双栏 grid 单列化，留下的栏占满全宽
+   （窄屏媒体查询本就单列，同值不冲突） */
+html.lang-only-en .zh-col,
+html.lang-only-en .zh-cap,
+html.lang-only-en .paper-header .zh-title { display: none; }
+html.lang-only-en .pair-row,
+html.lang-only-en .figure-block .caption,
+html.lang-only-en .table-block .caption,
+html.lang-only-en .list-block .li-grid { grid-template-columns: minmax(0, 1fr); }
+
+html.lang-only-zh .en-col,
+html.lang-only-zh .en-cap { display: none; }
+/* 英文主标题藏起后，中文标题顶替主标题的排版层级 */
+html.lang-only-zh .paper-header h1 { display: none; }
+html.lang-only-zh .paper-header .zh-title {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+html.lang-only-zh .pair-row,
+html.lang-only-zh .figure-block .caption,
+html.lang-only-zh .table-block .caption,
+html.lang-only-zh .list-block .li-grid { grid-template-columns: minmax(0, 1fr); }
+/* 目录项显示的是中文标题（PaperBody 按语言挑选），换中文字体 */
+html.lang-only-zh .toc a { font-family: var(--zh-font); }
