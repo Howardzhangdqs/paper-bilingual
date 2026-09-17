@@ -39,6 +39,12 @@ src/papers/<id>/
 图表/公式/章节编号、目录、引用跳转（cite → 文末文献、autoref → 对应图表）
 全部由框架按组件出现顺序自动推导，写上 `label` 即可。
 
+行内的引用/公式/脚注有两种等价写法，可在同一段落混用：行内组件
+（推荐，`<Cite k="…"/>`、`<Ref l="…"/>`、`<EqRef l="…"/>`、
+`<MathIn tex="…"/>`、`<Foot>…</Foot>`，同样从 `'…/paper'` 导入）或
+LaTeX 行内标记（`~\cite{…}`、`\autoref{…}`、`$…$` 等，由 richtext
+渲染器转换）；完整对照见 [docs/inline-components.md](docs/inline-components.md)。
+
 完整写作规范见 [docs/inline-components.md](docs/inline-components.md)。
 
 ## 目录结构
