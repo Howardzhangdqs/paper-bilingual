@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" en="Results: Complementary Strategies for Obtaining Additional Data" zh="结果：获取额外数据的互补策略" />
+<Heading :level="1" label="sec:beyond" en="Results: Complementary Strategies for Obtaining Additional Data" zh="结果：获取额外数据的互补策略" />
 
 <Figure src="figures/2305.16264/strategies.svg" :width="40" label="fig:beyond" caption-en="\textbf{Strategies for data-constrained settings and their downstream performance.} \emph{(Left):} Schematic showing alternative data use strategies of code filling and filtering. \emph{(Right):} $N=4.2$ billion parameter models trained for a total of $D=84$ billion tokens with varying budgets $D_C$. For repeating and filling with code, five models with different seeds are trained for each dot and the standard deviation is visualized as the shaded area." caption-zh="\textbf{面向数据受限情形的策略及其下游性能。}\emph{（左）：}代码填充与过滤等替代性数据使用策略的示意图。\emph{（右）：}$N=42$ 亿参数的模型在总词元数 $D=840$ 亿、数据预算 $D_C$ 各不相同下训练。对重复与代码填充，每个数据点训练 5 个不同随机种子的模型，阴影区域表示标准差。" />
 

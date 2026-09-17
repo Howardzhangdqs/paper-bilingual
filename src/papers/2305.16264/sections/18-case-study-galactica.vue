@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:limits" appendix en="Case Study: Galactica" zh="案例分析：Galactica" />
+<Heading :level="1" label="sec:galactica" appendix en="Case Study: Galactica" zh="案例分析：Galactica" />
 
 <Figure src="figures/2305.16264/galactica.svg" :width="100" label="fig:galactica" caption-en="\textbf{Optimal compute allocation for Galactica.} Efficient frontier assuming repeated data is worth the same as new data (Chinchilla scaling laws) and data-constrained efficient frontier assuming a unique token budget of 106 billion tokens like for the Galactica models~\cite{taylor2022galactica}. For optimal compute allocation according to our proposed data-constrained scaling laws, the 120 billion Galactica model should have been significantly smaller and trained for more epochs." caption-zh="\textbf{Galactica 的最优计算分配。}图中比较了假定重复数据与全新数据等价的有效前沿（Chinchilla 缩放定律），以及假定唯一词元预算为 1060 亿（与 Galactica 模型~\cite{taylor2022galactica} 相同）的数据受限有效前沿。按照我们所提数据受限缩放定律的最优计算分配，1200 亿参数的 Galactica 模型本应显著更小并训练更多 epoch。" />
 

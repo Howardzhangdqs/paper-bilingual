@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:code" appendix en="Additional Contour Plots" zh="更多等值线图" />
+<Heading :level="1" label="sec:addcon" appendix en="Additional Contour Plots" zh="更多等值线图" />
 
 <Para>
   <En>\autoref{fig:400m1b5isoloss} contains additional empirical isoLoss contours for 400 million and 1.5 billion unique tokens. Results show that like in \autoref{fig:100misoloss} significantly lower loss can be achieved by increasing parameters and epochs beyond what is compute-optimal at a single epoch. The lowest loss is also achieved by allocating more extra compute to repeating data rather than to adding parameters.</En>

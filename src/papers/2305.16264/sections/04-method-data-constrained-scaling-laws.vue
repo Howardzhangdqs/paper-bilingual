@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Equation, Bullets, Item } from '../../../compone
 </script>
 
 <template>
-<Heading :level="1" label="sec:exp" en="Method: Data-Constrained Scaling Laws" zh="方法：数据受限的缩放定律" />
+<Heading :level="1" label="sec:method" en="Method: Data-Constrained Scaling Laws" zh="方法：数据受限的缩放定律" />
 
 <Para>
   <En>We are interested in scaling behavior in the data-constrained regime. Specifically, given a limited amount of unique data, what is the best \textit{Allocation} of and \textit{Return} for computational resources. Prior work~\cite{kaplan2020scaling,hoffmann2022training} assumes that the necessary data to support scaling is unlimited. Our aim is therefore to introduce a modified version of \autoref{eq:ccbase} that accounts for data constraints and fit the terms in the modified scaling law to data from a large body of experiments.</En>
@@ -49,7 +49,7 @@ import { Heading, Para, En, Zh, Equation, Bullets, Item } from '../../../compone
   <Zh>在讨论实验结果之前，先介绍参数化的假设。</Zh>
 </Para>
 
-<Heading :level="2" en="Parametric Fit" zh="参数化拟合" />
+<Heading :level="2" label="sec:parametricfit" en="Parametric Fit" zh="参数化拟合" />
 
 <Para>
   <En>To extrapolate scaling curves, it is necessary to incorporate repetition into the Chinchilla formula (\autoref{eq:ccbase}). We generalize \autoref{eq:ccbase} by replacing $D$ and $N$ with terms corresponding to the \emph{effective data} ($D'$) and \emph{effective model parameters} ($N'$).</En>
@@ -59,18 +59,17 @@ import { Heading, Para, En, Zh, Equation, Bullets, Item } from '../../../compone
 <Equation :numbered="false" latex="L(N,D)=\frac{A}{N'^\alpha} + \frac{B}{D'^\beta} + E"
   :tips="{ L: '交叉熵损失', N: '实际参数量', D: '实际训练词元数', 'N\'': '有效模型参数（考虑参数重复的折减）', 'D\'': '有效数据量（考虑数据重复的折减）', A: '参数项系数', '\\alpha': '参数项幂律指数', B: '数据项系数', '\\beta': '数据项幂律指数', E: '不可约损失下限' }" />
 
+<Para>
+  <En>Intuitively, $D'$ should be smaller or equal to $D$ where $D$ is the total number of processed tokens since repeated tokens provide less useful information to the model than new ones. We use an \emph{exponential decay} formulation, where the value of a data token processed loses roughly $(1-1/R^*_D)$ fraction of its value per repetition, where $R^*_D$ is a learned constant. After some derivations and approximations (see \autoref{sec:scalinglaws}), this boils down to</En>
+  <Zh>直观上，$D'$ 应小于或等于 $D$（即处理过的总词元数），因为重复词元提供给模型的有用信息比新词元少。我们采用\emph{指数衰减}的形式：每重复一次，已处理数据词元的价值大约损失 $(1-1/R^*_D)$ 的比例，其中 $R^*_D$ 是一个学得的常数。经过若干推导与近似（见 \autoref{sec:scalinglaws}），这最终归结为</Zh>
+</Para>
+
 <Equation  label="eq:repd" latex="D' = U_D + U_D R_D^* (1 - e^{\frac{-R_D}{R_D^*}}) \;"
-  :tips="{ 'D\'': '有效数据量：重复折算后相当于的全新词元数', U_D: '使用的唯一词元数', 'R_D': '数据重复次数（epoch 数减 1）', 'R_D^*': '重复的临界值：学得常数，约为重复价值的“半衰期”' }" />
-
-<Equation :numbered="false" latex="D' \approx U_D + U_DR^*_D(1-1+ R_D/R^*_D) = U_D(1+R_D)=D"
-  :tips="{ 'D\'': '有效数据量', U_D: '使用的唯一词元数', 'R_D': '数据重复次数', 'R^*_D': '重复的临界值（学得常数）', D: '总训练词元数' }" />
-
-<Equation :numbered="false" latex="D' \approx U_D + U_DR^*_D(1-1+ R_D/R^*_D) = U_D(1+R_D)=D"
-  :tips="{ 'D\'': '有效数据量', U_D: '使用的唯一词元数', 'R_D': '数据重复次数', 'R^*_D': '重复的临界值（学得常数）', D: '总训练词元数' }" />
+  :tips="{ 'D\'': '有效数据量：重复折算后相当于的全新词元数', U_D: '使用的唯一词元数', 'R_D': '数据重复次数（epoch 数减 1）', 'R_D^*': '重复的临界值：学得常数，约为重复价值的“半衰期”', D: '总训练词元数' }" />
 
 <Para>
-  <En>Intuitively, $D'$ should be smaller or equal to $D$ where $D$ is the total number of processed tokens since repeated tokens provide less useful information to the model than new ones. We use an \emph{exponential decay} formulation, where the value of a data token processed loses roughly $(1-1/R^*_D)$ fraction of its value per repetition, where $R^*_D$ is a learned constant.  After some derivations and approximations (see \autoref{sec:scalinglaws}), this boils down to Note that for $R_D=0$ (no repetitions), $D'=U_D=D$. For $R_D  \ll R^*_D$, $e^{-R_D/R^*_D}\approx 1- \tfrac{R_D}{R^*_D}$ and so and hence in this case, repeated data is worth almost the same as fresh data. (This is also consistent with the predictions of the ``deep bootstrap'' framework~\cite{NakkiranNS21}.) As $R_D$ grows, the value of repeated tokens tends to zero, and the effective data $D'$ becomes much smaller than $D$. The formula implies that no matter how many times we repeat the data, we will not get a better loss than could be obtained with a single epoch on  $U_D + U_DR^*_D$ fresh tokens.</En>
-  <Zh>直观上，$D'$ 应小于或等于 $D$（即处理过的总词元数），因为重复词元提供给模型的有用信息比新词元少。 我们采用\emph{指数衰减}的形式：每重复一次，已处理数据词元的价值大约损失 $(1-1/R^*_D)$ 的比例，其中 $R^*_D$ 是一个学得的常数。 经过若干推导与近似（见 \autoref{sec:scalinglaws}），这最终归结为 注意，当 $R_D=0$（无重复）时，$D'=U_D=D$。 当 $R_D  \ll R^*_D$ 时，$e^{-R_D/R^*_D}\approx 1- \tfrac{R_D}{R^*_D}$，于是 因此在这种情况下，重复数据的价值几乎与全新数据相同。 （这也与“深层自举”（deep bootstrap）框架~\cite{NakkiranNS21}的预测一致。） 随着 $R_D$ 增大，重复词元的价值趋于零，有效数据 $D'$ 也变得远小于 $D$。 该公式意味着，无论把数据重复多少次，我们都无法获得优于对 $U_D + U_DR^*_D$ 个全新词元做单个 epoch 训练所能得到的损失。</Zh>
+  <En>Note that for $R_D=0$ (no repetitions), $D'=U_D=D$. For $R_D  \ll R^*_D$, $e^{-R_D/R^*_D}\approx 1- \tfrac{R_D}{R^*_D}$ and so $D' \approx U_D + U_DR^*_D(1-1+ R_D/R^*_D) = U_D(1+R_D)=D$ and hence in this case, repeated data is worth almost the same as fresh data. (This is also consistent with the predictions of the ``deep bootstrap'' framework~\cite{NakkiranNS21}.) As $R_D$ grows, the value of repeated tokens tends to zero, and the effective data $D'$ becomes much smaller than $D$. The formula implies that no matter how many times we repeat the data, we will not get a better loss than could be obtained with a single epoch on  $U_D + U_DR^*_D$ fresh tokens.</En>
+  <Zh>注意，当 $R_D=0$（无重复）时，$D'=U_D=D$。当 $R_D  \ll R^*_D$ 时，$e^{-R_D/R^*_D}\approx 1- \tfrac{R_D}{R^*_D}$，于是 $D' \approx U_D + U_DR^*_D(1-1+ R_D/R^*_D) = U_D(1+R_D)=D$，因此在这种情况下，重复数据的价值几乎与全新数据相同。（这也与“深层自举”（deep bootstrap）框架~\cite{NakkiranNS21}的预测一致。）随着 $R_D$ 增大，重复词元的价值趋于零，有效数据 $D'$ 也变得远小于 $D$。该公式意味着，无论把数据重复多少次，我们都无法获得优于对 $U_D + U_DR^*_D$ 个全新词元做单个 epoch 训练所能得到的损失。</Zh>
 </Para>
 
 <Para>

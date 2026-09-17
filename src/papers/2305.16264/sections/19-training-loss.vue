@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:contributions" appendix en="Training Loss" zh="训练损失" />
+<Heading :level="1" label="sec:trainlossc4" appendix en="Training Loss" zh="训练损失" />
 
 <Para>
   <En>\citet{hoffmann2022training} use training loss as their core metric. However, when repeating data for multiple epochs, training loss is a bad metric as models will overfit to the limited data available as shown in \autoref{fig:trainingc4}. Thus, we use loss on a held-out test set as our key performance metric.</En>

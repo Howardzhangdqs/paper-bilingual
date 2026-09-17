@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" appendix en="Broader Impacts" zh="更广泛的影响" />
+<Heading :level="1" label="sec:broad" appendix en="Broader Impacts" zh="更广泛的影响" />
 
 <Para>
   <En>Large language models carry potential risks such as outputting offensive language, propagating social biases, and leaking private information \cite{weidinger2021ethical,bender2021dangers}. By publicly releasing all of our models and providing new insights to improve the scaling of LLMs we may contribute to the further proliferation of these harms. However, we note that there are already much larger and more capable models freely available~\cite{black2021gpt,black2022gpt,scao2022bloom,biderman2023pythia} that can be used in such harmful ways. Thus, we consider the open-source release of our models and research to significantly outweigh its downsides.</En>

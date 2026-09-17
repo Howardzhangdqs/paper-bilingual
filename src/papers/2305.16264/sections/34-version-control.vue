@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Bullets, Item } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" appendix en="Version Control" zh="版本记录" />
+<Heading :level="1" label="sec:vc" appendix en="Version Control" zh="版本记录" />
 
 <Para>
   <En>\textbf{V4 → V5:}</En>

@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:addfilter" appendix en="Repeating on Heavily Deduplicated Data" zh="在深度去重数据上的重复训练" />
+<Heading :level="1" appendix en="Repeating on Heavily Deduplicated Data" zh="在深度去重数据上的重复训练" />
 
 <Para>
   <En>To investigate whether \autoref{fig:100misoloss} is dependent on the inherent amount of duplicates in the selected 100 million tokens, we train several models on a deduplicated version of C4 (see \autoref{sec:filtering}). We plot the performance of the models trained on the deduplicated C4 versus the regular C4 in \autoref{fig:dedup}. All models are evaluated on the same validation dataset from the regular C4. Regardless of deduplication we find 59 epochs to be optimal and the overall trend to be very similar. Together with our results on OSCAR~(\autoref{sec:fixoscar}), this suggests that our work generalizes to different datasets with different inherent amounts of duplicates.</En>

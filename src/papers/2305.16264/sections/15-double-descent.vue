@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:filtering" appendix en="Double Descent" zh="双下降" />
+<Heading :level="1" label="sec:dd" appendix en="Double Descent" zh="双下降" />
 
 <Para>
   <En>Prior work has reported double descent phenomena when repeating data, where the loss initially increases and then decreases again as the model is trained for more epochs~\cite{nakkiran2021deep,hernandez2022scaling}. In \autoref{fig:dd}, we plot the loss curves of several models trained for varying epochs on 100 million tokens. We find double descent phenomena with the loss of all models increasing at 200 epochs before decreasing again. This contributes to additional noise in the fitting of our functions in \autoref{sec:scalinglaws}, as our functional form assumes loss to be monotonically decreasing as epochs increase. Thus, we remove most such examples from the fitting.</En>

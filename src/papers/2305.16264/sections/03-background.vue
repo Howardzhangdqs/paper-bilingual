@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Equation, Bullets, Item } from '../../../compone
 </script>
 
 <template>
-<Heading :level="1" label="sec:method" en="Background" zh="背景" />
+<Heading :level="1" label="sec:background" en="Background" zh="背景" />
 
 <Para>
   <En>Predicting the scaling behavior of large models is critical when deciding on training resources. Specifically, two questions are of interest: \textit{(Allocation)} What is the optimal balance of resources? \textit{(Return)} What is the expected value of additional resources?  For scaling LLMs, the resource is compute (measured in FLOPs), and it can be allocated to training a larger model or training for more steps.\footnote{In this work we use  \cite{kaplan2020scaling}'s approximation for the compute cost: $\text{FLOPs}(N, D) \approx 6 N D$, where N denotes the number of model parameters and D denotes the number of tokens processed.}  The metric used to quantify progress is the model's loss on held-out data, i.e.\ the ability to predict the underlying data as measured in the model's cross-entropy~\cite{alabdulmohsin2022revisiting,hoffmann2022training}. We aim to minimize the loss ($L$) subject to a compute resource constraint ($C$) via optimal allocation to $N$ and $D$ as:</En>

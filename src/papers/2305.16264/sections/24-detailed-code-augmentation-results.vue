@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Table, Td } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:vc" appendix en="Detailed Code Augmentation Results" zh="代码增广的详细结果" />
+<Heading :level="1" label="sec:code" appendix en="Detailed Code Augmentation Results" zh="代码增广的详细结果" />
 
 <Para>
   <En>We report tabular results for replacing part of C4 or OSCAR with code for 4.2 billion parameter and 2.8 billion parameter models in Tables~\ref{tab:4b2py}-\ref{tab:2b8py}. We find that training on up to 50\% of Python data maintains performance on all natural language tasks while enabling huge performance gains on state-tracking (bAbI) for C4. For OSCAR gains are less clear, which is likely due to OSCAR containing code~\cite{ortiz-suarez-etal-2020-monolingual}, while code data was explicitly filtered out for C4~\cite{raffel2020exploring}.</En>

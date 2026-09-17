@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" appendix en="Release of Artifacts" zh="成果发布" />
+<Heading :level="1" label="sec:release" appendix en="Release of Artifacts" zh="成果发布" />
 
 <Para>
   <En>We open-source all of our models and code under Apache 2.0 licenses. Our filtered datasets are released with the same licenses as the datasets they stem from. All material can be found at: \url{https://github.com/huggingface/datablations}.</En>

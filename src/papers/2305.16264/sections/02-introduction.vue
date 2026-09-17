@@ -4,11 +4,11 @@ import { Heading, Para, En, Zh } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:background" en="Introduction" zh="引言" />
+<Heading :level="1" en="Introduction" zh="引言" />
 
 <Para>
   <En>Recent work on compute-optimal language models~\cite{hoffmann2022training} shows that many previously trained large language models (LLMs, which we define as having more than one billion parameters) could have attained better performance for a given compute budget by training a smaller model on more data. Notably, the 70-billion parameter Chinchilla model~\cite{hoffmann2022training} outperforms the 280-billion parameter Gopher model~\cite{rae2021scaling} while using a similar compute budget by being trained on four times more data. Extrapolating these laws for compute allocation (hereafter "Chinchilla scaling laws") to a 530 billion parameter model, such as the under-trained MT-NLG model~\cite{smith2022using}, would require training on a massive 11 trillion tokens, corresponding to more than 30 terabytes of text data. For most languages, available data is several orders of magnitude smaller, meaning that LLMs in those languages are already data-constrained. \citet{villalobos2022will} estimate that even high-quality English language data will be exhausted by the year 2024 given the Chinchilla scaling laws and the trend of training ever-larger models. This motivates the question~\citep{villalobos2022will,nostalgebraist}: what should we do when we run out of data?</En>
-  <Zh>最近关于计算最优语言模型的工作~\cite{hoffmann2022training}表明：对于给定的计算预算，许多此前训练的大语言模型（LLM，本文定义为参数量超过 10 亿的模型）本可以通过“用更多数据训练更小的模型”来获得更好的性能。 notably，700 亿参数的 Chinchilla 模型~\cite{hoffmann2022training}在相近的计算预算下，凭借四倍于后者的训练数据，性能超过了 2800 亿参数的 Gopher 模型~\cite{rae2021scaling}。若把这类计算分配定律（下称“Chinchilla 缩放定律”）外推到 5300 亿参数的模型（如训练不足的 MT-NLG~\cite{smith2022using}），将需要在高达 11 万亿词元的庞大数据上训练，相当于超过 30TB 的文本数据。对大多数语言而言，可用数据的规模要小若干个数量级，这意味着这些语言的 LLM 已经处于数据受限状态。\citet{villalobos2022will} 估计，按照 Chinchilla 缩放定律与不断训练更大模型的趋势，即便是高质量的英文数据也将在 2024 年前耗尽。这引出了一个问题~\citep{villalobos2022will,nostalgebraist}：当数据耗尽时，我们该怎么办？</Zh>
+  <Zh>最近关于计算最优语言模型的工作~\cite{hoffmann2022training}表明：对于给定的计算预算，许多此前训练的大语言模型（LLM，本文定义为参数量超过 10 亿的模型）本可以通过“用更多数据训练更小的模型”来获得更好的性能。值得注意的是，700 亿参数的 Chinchilla 模型~\cite{hoffmann2022training}在相近的计算预算下，凭借四倍于后者的训练数据，性能超过了 2800 亿参数的 Gopher 模型~\cite{rae2021scaling}。若把这类计算分配定律（下称“Chinchilla 缩放定律”）外推到 5300 亿参数的模型（如训练不足的 MT-NLG~\cite{smith2022using}），将需要在高达 11 万亿词元的庞大数据上训练，相当于超过 30TB 的文本数据。对大多数语言而言，可用数据的规模要小若干个数量级，这意味着这些语言的 LLM 已经处于数据受限状态。\citet{villalobos2022will} 估计，按照 Chinchilla 缩放定律与不断训练更大模型的趋势，即便是高质量的英文数据也将在 2024 年前耗尽。这引出了一个问题~\citep{villalobos2022will,nostalgebraist}：当数据耗尽时，我们该怎么办？</Zh>
 </Para>
 
 <Para>
@@ -23,6 +23,6 @@ import { Heading, Para, En, Zh } from '../../../components/paper'
 
 <Para>
   <En>Finally, given the challenges imposed by data constraints, we consider methods complementary to repeating for improving downstream accuracy without adding new natural language data. Experiments consider incorporating code tokens and relaxing data filtering. For code, English LLMs, such as PaLM~\cite{chowdhery2022palm} or Gopher~\cite{rae2021scaling}, are trained on a small amount of code data alongside natural language data, though no benchmarking was reported to justify that decision. We investigate training LLMs on a mix of language data and Python data at 10 different mixing rates and find that mixing in code is able to provide a 2$\times$ increase in effective tokens even when evaluating only natural language tasks. For filtering, we revisit perplexity and deduplication filtering strategies on both noisy and clean datasets and find that data filtering is primarily effective for noisy datasets.</En>
-  <Zh>在数据过滤方面，我们在含噪与干净两类数据集上重新审视了困惑度过滤与去重过滤策略，发现数据过滤主要对含噪数据集有效。</Zh>
+  <Zh>最后，面对数据约束带来的挑战，我们考虑了与重复互补的方法，在不新增自然语言数据的前提下提升下游准确率。实验考察了两种手段：加入代码词元，以及放宽数据过滤。就代码而言，PaLM~\cite{chowdhery2022palm}、Gopher~\cite{rae2021scaling} 等英文 LLM 在自然语言数据之外还使用了少量代码数据训练，但当时并未报告基准测试来支持这一决定。我们研究了在语言数据与 Python 数据的混合数据上训练 LLM，共采用 10 种不同的混合比例，发现即使只在自然语言任务上评估，混入代码也能带来 2$\times$ 的有效词元提升。在数据过滤方面，我们在含噪与干净两类数据集上重新审视了困惑度过滤与去重过滤策略，发现数据过滤主要对含噪数据集有效。</Zh>
 </Para>
 </template>

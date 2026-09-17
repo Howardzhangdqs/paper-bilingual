@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" appendix en="Contributions" zh="贡献" />
+<Heading :level="1" label="sec:contributions" appendix en="Contributions" zh="贡献" />
 
 <Para>
   <En>\textbf{Niklas Muennighoff} led experiments, analysis, writing, and the overall project. He implemented, trained and evaluated all models. \textbf{Alexander M. Rush} contributed to framing, results analysis, and paper writing. \textbf{Boaz Barak} contributed to formal and experimental analysis as well as paper writing. \textbf{Teven Le Scao} provided guidance, led data choices and preprocessing, and contributed to framing and writing. \textbf{Aleksandra Piktus} created perplexity and deduplication datasets and contributed to writing. \textbf{Nouamane Tazi} contributed to enabling high-performance training on AMD hardware. \textbf{Sampo Pyysalo} contributed to enabling high-performance training and early repetition experiments. \textbf{Thomas Wolf} provided guidance on experimental design and contributed to paper writing. \textbf{Colin Raffel} provided guidance on experimental design and contributed to paper writing.</En>

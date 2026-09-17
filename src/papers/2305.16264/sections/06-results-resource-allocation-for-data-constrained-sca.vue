@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:fixc" en="Results: Resource Allocation for Data-Constrained Scaling" zh="结果：数据受限扩展的资源分配" />
+<Heading :level="1" label="sec:fixu" en="Results: Resource Allocation for Data-Constrained Scaling" zh="结果：数据受限扩展的资源分配" />
 
 <Figure src="figures/2305.16264/isoloss_100m.svg" :width="100" label="fig:100misoloss" caption-en="\textbf{IsoLoss contours for 100 million unique tokens.} \textit{(Left):} 93 models trained with varying parameters and epochs on a fixed dataset. Contours show an interpolation of results with the same final test loss. \textit{(Right):} Comparison with the loss predictions from our proposed scaling laws for the same budget of 100 million unique tokens and the predicted efficient frontier. The diminishing returns from training on repeated data can be seen in the increase in distance of the contour curves." caption-zh="\textbf{1 亿唯一词元的等损失（IsoLoss）等值线。}\textit{（左）：}在固定数据集上以不同参数量与 epoch 数训练的 93 个模型。等值线显示相同最终测试损失结果的插值。\textit{（右）：}与我们所提缩放定律在同一 1 亿唯一词元预算下的损失预测以及预测的有效前沿的比较。重复数据训练的回报递减可以从等值线间距的增大中看出。" />
 

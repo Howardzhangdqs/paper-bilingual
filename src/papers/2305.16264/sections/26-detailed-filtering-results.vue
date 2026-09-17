@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Table, Td } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" appendix en="Detailed Filtering Results" zh="过滤的详细结果" />
+<Heading :level="1" label="sec:addfilter" appendix en="Detailed Filtering Results" zh="过滤的详细结果" />
 
 <Para>
   <En>In \autoref{tab:pplx}, we report detailed perplexity filtering results on C4 and OSCAR. For C4, perplexity filtering is only effective at 4.2B parameters. Meanwhile, for OSCAR, which is noisier than C4, perplexity filtering seems effective both for 2.8B and 4.2B parameters. \autoref{tab:dedup} contains deduplication results and results for the ROOTS filter. Deduplication does not improve downstream performance for C4 while being effective for OSCAR which has significantly more noise. Applying the ROOTS filter on OSCAR is not better than the unfiltered OSCAR on our benchmark, but might have other beneficial effects, such as reducing obscenity, templated messages, or repetition, depending on the final use case.</En>

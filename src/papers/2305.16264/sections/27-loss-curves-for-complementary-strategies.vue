@@ -4,9 +4,9 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" appendix en="Loss Curves for Complementary Strategies" zh="互补策略的损失曲线" />
+<Heading :level="1" label="sec:losscomp" appendix en="Loss Curves for Complementary Strategies" zh="互补策略的损失曲线" />
 
-<Figure src="figures/2305.16264/validation_c4py.svg" :width="100" label="fig:valc4py" caption-en="\textbf{Validation loss of models trained on a mix of natural language (C4) and Python data.}" caption-zh="（\textbf{在自然语言（C4）与 Python 数据混合上训练的模型的验证损失。）}" />
+<Figure src="figures/2305.16264/validation_c4py.svg" :width="100" label="fig:valc4py" caption-en="\textbf{Validation loss of models trained on a mix of natural language (C4) and Python data.}" caption-zh="\textbf{在自然语言（C4）与 Python 数据混合上训练的模型的验证损失。}" />
 
 <Figure src="figures/2305.16264/training_validation_filter.svg" :width="100" label="fig:beyondloss" caption-en="\textbf{Validation and training loss of models trained with different data strategies.} Training loss is smoothed with exponential moving average smoothing and a weight of 0.999. Downstream performance of the models is in \autoref{fig:beyond}." caption-zh="\textbf{不同数据策略训练的模型的验证损失与训练损失。}训练损失经权重 0.999 的指数移动平均平滑。模型的下游性能见 \autoref{fig:beyond}。" />
 

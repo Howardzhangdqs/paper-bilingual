@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Table, Td } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:release" appendix en="Downstream Repetition Results" zh="下游重复训练结果" />
+<Heading :level="1" label="sec:downrep" appendix en="Downstream Repetition Results" zh="下游重复训练结果" />
 
 <Para>
   <En>In Tables~\ref{tab:2b8rep}-\ref{tab:8b7oscarrep} we report downstream results of all models trained on C4~\cite{raffel2020exploring} and OSCAR~\cite{ortiz-suarez-etal-2020-monolingual} according to the configurations in \autoref{fig:validation}. All scores are from the final checkpoints at the end of training. OSCAR is a noisier dataset than C4 due to less filtering, thus models trained on C4 generally perform better. Notably, models trained on C4 completely fail on bAbI~\cite{weston2015towards}, while OSCAR models are able to perform better than random. This is likely due to code data being present in OSCAR, which enables state-tracking capabilities like for code augmented models in \autoref{sec:beyond}. For C4 the creators strictly removed all data that resembles code \cite{raffel2020exploring}. There are no significant differences between models trained for a single epoch and models trained for up to 4 epochs. Even models trained for more epochs (and thus on less unique data) have similar performance.</En>

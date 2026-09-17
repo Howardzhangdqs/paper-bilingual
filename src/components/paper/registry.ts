@@ -146,12 +146,20 @@ export function providePaper(data: PaperData = {}): {
           }
           break
         case 'heading': {
-          if (it.appendix) appendix = true
-          if (it.level === 1) {
+          /* 首个附录章节：编号重置，从 A 重新起算（主文不占字母） */
+          if (it.appendix && !appendix) {
+            appendix = true
+            sec = 0
             sub = 0
-            sec++
-          } else if (it.level === 2) {
-            sub++
+          }
+          /* toc=false 的标题（摘要、致谢等）不占编号，与目录口径一致 */
+          if (it.toc !== false) {
+            if (it.level === 1) {
+              sub = 0
+              sec++
+            } else if (it.level === 2) {
+              sub++
+            }
           }
           const secNo = appendix ? String.fromCharCode(64 + sec) : String(sec)
           const domId = it.id || `sec-${headingIdx}`
@@ -258,7 +266,12 @@ export function useToc(ctx: PaperContext) {
     let appendix = false
     for (const it of ctx.items) {
       if (it.type !== 'heading' || it.toc === false || (it.level ?? 1) > 2) continue
-      if (it.appendix) appendix = true
+      /* 首个附录章节：编号重置，从 A 重新起算 */
+      if (it.appendix && !appendix) {
+        appendix = true
+        sec = 0
+        sub = 0
+      }
       if (it.level === 1) {
         sub = 0
         sec++

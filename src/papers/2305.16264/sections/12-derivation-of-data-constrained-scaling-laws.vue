@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure, Equation, Table, Td } from '../../../com
 </script>
 
 <template>
-<Heading :level="1" label="sec:eval" appendix en="Derivation of Data-Constrained Scaling Laws" zh="数据受限缩放定律的推导" />
+<Heading :level="1" label="sec:scalinglaws" appendix en="Derivation of Data-Constrained Scaling Laws" zh="数据受限缩放定律的推导" />
 
 <Para>
   <En>Let $N$ be the number of model parameters, $D$ be the training tokens and $U$ be the "unique" training tokens i.e. the size of the dataset that is to be trained on for one or more epochs. Chinchilla~\cite{hoffmann2022training} only deals with non-repeated tokens, thus $D=U$ and we can write their formula  (``Approach 3'') as:</En>
@@ -70,8 +70,8 @@ import { Heading, Para, En, Zh, Figure, Equation, Table, Td } from '../../../com
   :tips="{ x: '小量（此处取 -δ）', '\\delta': '每次重复损失的信息比例', 'R^*_D': '重复的临界值 =(1-δ)/δ：超过后回报急剧递减' }" />
 
 <Para>
-  <En>Now inserting $(1-\delta)/\delta=R_D^*$ and $(1-\delta)^{R_D}= e^{(-1/R^*_D)^{R_D&#125;&#125;$ into \autoref{eq:ar} we get our final equation representing the \emph{effective data}:</En>
-  <Zh>现在把 $(1-\delta)/\delta=R_D^*$ 与 $(1-\delta)^{R_D}= e^{(-1/R^*_D)^{R_D&#125;&#125;$ 代入 \autoref{eq:ar}，便得到表示\emph{有效数据}的最终方程：</Zh>
+  <En>Now inserting $(1-\delta)/\delta=R_D^*$ and $(1-\delta)^{R_D}= e^{(-1/R^*_D)^{R_D}}$ into \autoref{eq:ar} we get our final equation representing the \emph{effective data}:</En>
+  <Zh>现在把 $(1-\delta)/\delta=R_D^*$ 与 $(1-\delta)^{R_D}= e^{(-1/R^*_D)^{R_D}}$ 代入 \autoref{eq:ar}，便得到表示\emph{有效数据}的最终方程：</Zh>
 </Para>
 
 <Equation  label="eq:dterm" latex="D' = U + U\cdot R_D^* \cdot(1- e^{-R_D/R_D^*})"
@@ -98,8 +98,8 @@ L(U_N,U_D,R_N,R_D)=\frac{A}{(U_N + U_N R_N^* (1 - e^{\frac{-R_N}{R_N^*}}))^\alph
   :tips="{ L: '数据受限缩放定律预测的损失', U_N: '基础参数量（最优拟合唯一词元所需）', U_D: '唯一词元数', 'R_N': '参数“重复”次数', 'R_D': '数据重复次数', 'R_N^*': '参数重复临界值（学得）', 'R_D^*': '数据重复临界值（学得）', A: '参数项系数', '\\alpha': '参数项幂律指数', B: '数据项系数', '\\beta': '数据项幂律指数', E: '不可约损失下限' }" />
 
 <Para>
-  <En>We define $U_N$, as the number of "unique" parameters that provide an optimal fit for $U_D$. Additional parameters decay with a symmetric version of the expression for repeated data. $R_N$ is the number that the "unique" parameters are repeated i.e. $R_N = \max\{(N / U_N) - 1, 0\}$. If $R_N^*=\infty$, additional parameters do not decay at all and $(U_N + U_N R_N^* (1 - e^{\frac{-R_N}{R_N^*&#125;&#125;))$ reduces to $N$. We compute $U_N$ from $U_D$ by setting $D_{opt}=U_D$ and rearranging \autoref{eq:ccopt} to map from $D_{opt}$ to $N_{opt}$. $U_N$ is then $\min\{N_{opt}, N\}$. This is equivalent to the following:</En>
-  <Zh>我们把 $U_N$ 定义为对 $U_D$ 提供最优拟合的“唯一”参数量。过剩参数按重复数据表达式的对称版本衰减。$R_N$ 是“唯一”参数被重复的次数，即 $R_N = \max\{(N / U_N) - 1, 0\}$。若 $R_N^*=\infty$，过剩参数完全不衰减，$(U_N + U_N R_N^* (1 - e^{\frac{-R_N}{R_N^*&#125;&#125;))$ 退化为 $N$。计算 $U_N$ 时，令 $D_{opt}=U_D$ 并对 \autoref{eq:ccopt} 适当变形以从 $D_{opt}$ 映射到 $N_{opt}$，从而由 $U_D$ 得到 $U_N$；$U_N$ 即为 $\min\{N_{opt}, N\}$。这等价于下式：</Zh>
+  <En>We define $U_N$, as the number of "unique" parameters that provide an optimal fit for $U_D$. Additional parameters decay with a symmetric version of the expression for repeated data. $R_N$ is the number that the "unique" parameters are repeated i.e. $R_N = \max\{(N / U_N) - 1, 0\}$. If $R_N^*=\infty$, additional parameters do not decay at all and $(U_N + U_N R_N^* (1 - e^{\frac{-R_N}{R_N^*}}))$ reduces to $N$. We compute $U_N$ from $U_D$ by setting $D_{opt}=U_D$ and rearranging \autoref{eq:ccopt} to map from $D_{opt}$ to $N_{opt}$. $U_N$ is then $\min\{N_{opt}, N\}$. This is equivalent to the following:</En>
+  <Zh>我们把 $U_N$ 定义为对 $U_D$ 提供最优拟合的“唯一”参数量。过剩参数按重复数据表达式的对称版本衰减。$R_N$ 是“唯一”参数被重复的次数，即 $R_N = \max\{(N / U_N) - 1, 0\}$。若 $R_N^*=\infty$，过剩参数完全不衰减，$(U_N + U_N R_N^* (1 - e^{\frac{-R_N}{R_N^*}}))$ 退化为 $N$。计算 $U_N$ 时，令 $D_{opt}=U_D$ 并对 \autoref{eq:ccopt} 适当变形以从 $D_{opt}$ 映射到 $N_{opt}$，从而由 $U_D$ 得到 $U_N$；$U_N$ 即为 $\min\{N_{opt}, N\}$。这等价于下式：</Zh>
 </Para>
 
 <Equation  label="eq:optunud" latex="\begin{aligned}
@@ -212,23 +212,11 @@ D'=U\tfrac{1-(e^{-R_D^*})^{R_D + 1}}{1-e^{-R_D^*}}
 
 <Heading :level="2" en="Analytical properties of compute-optimal point" zh="计算最优点的解析性质" />
 
-<Equation :numbered="false" latex="L = L_N + L_D + \text{\it  const}"
-  :tips="{ L: '总损失', L_N: '参数项贡献的损失', L_D: '数据项贡献的损失' }" />
-
-<Equation  label="eq:maxversion" latex="L = \max \{ L_N, L_D \}"
-  :tips="{ L: '总损失（取主导项近似）', L_N: '参数项贡献的损失', L_D: '数据项贡献的损失' }" />
-
-<Equation :numbered="false" latex="\tfrac{A}{N^\alpha} = \tfrac{B}{D^\beta}"
-  :tips="{ A: '参数项系数', N: '参数量', '\\alpha': '参数项幂律指数', B: '数据项系数', D: '训练词元数', '\\beta': '数据项幂律指数' }" />
-
-<Equation :numbered="false" latex="C^{\beta}\tfrac{A}{B} = N^{\alpha+\beta}"
-  :tips="{ C: '计算预算（FLOPs）', A: '参数项系数', B: '数据项系数', N: '最优参数量', '\\alpha': '参数项幂律指数', '\\beta': '数据项幂律指数' }" />
-
 <Figure src="figures/2305.16264/cartoon.svg" :width="100" label="fig:cartoonmultiepoch" caption-en="A cartoon of how the compute-optimal tradeoff deviates from Chinchilla as we increase the number of epochs. Initially the model size and tokens processed grow proportionally ($R_N=R_D$) but since $R^*_N < R^*_D$, at some point adding parameters offers worse returns compared to increasing the number of tokens processed, and hence we deviate from the Chinchilla curve." caption-zh="示意图：随着 epoch 数增加，计算最优的权衡如何偏离 Chinchilla。起初模型规模与处理词元数成比例增长（$R_N=R_D$），但由于 $R^*_N < R^*_D$，从某一点起增加参数的回报劣于增加处理词元数，于是我们偏离了 Chinchilla 曲线。" />
 
 <Para>
-  <En>Write $U_D = cU_N$ (for Chinchilla $c\approx 20$). When $R_D \ll R^*_D$ and $R_N \ll R^*_N$, our scaling agrees with Chinchilla, and so the point $(U_N,U_D)$, corresponding to $R_D=R_N=0$ is on the optimal compute curve. Increasing $R_D$ by $\epsilon$ corresponds to increasing the number of tokens by $\epsilon U_D = \epsilon c U_N$, while increasing $R_N$ by $\epsilon$ corresponds to increasing the number of parameters by $\epsilon U_N$. For small positive $R_D,R_N$, our curve agrees with Chinchilla and so we need to increase $R_N,R_D$ by the same amount to maintain the proportionality. Hence up to some value $r>0$, the optimal compute curve corresponds to $R_N=R_D=r$. Our curve differs from Chinchilla when $r$ gets closer to either $R^*_N$ or $R^*_D$. At this point, we start to see sharply diminishing returns. 记 $U_D = cU_N$（对 Chinchilla 而言 $c\approx 20$）。</En>
-  <Zh>当 $R_D \ll R^*_D$ 且 $R_N \ll R^*_N$ 时，我们的缩放与 Chinchilla 一致，因此对应于 $R_D=R_N=0$ 的点 $(U_N,U_D)$ 位于最优计算曲线上。 把 $R_D$ 增加 $\epsilon$ 相当于把词元数增加 $\epsilon U_D = \epsilon c U_N$；而把 $R_N$ 增加 $\epsilon$ 相当于把参数量增加 $\epsilon U_N$。 对较小的正数 $R_D,R_N$，我们的曲线与 Chinchilla 一致，因此需要等量增加 $R_N,R_D$ 以保持比例。于是在达到某个 $r>0$ 之前，最优计算曲线对应于 $R_N=R_D=r$。 当 $r$ 接近 $R^*_N$ 或 $R^*_D$ 时，我们的曲线开始不同于 Chinchilla。此时回报开始急剧递减。</Zh>
+  <En>In our case, consider the setting of a fixed compute budget $C$ and a fixed budget of unique tokens $U_D$ implying a set of unique parameters $U_N$. Let $R_D$ denote the number of times we repeat data (we assume that we are in the multi-epoch regime and hence $R_D>0$). Write $U_D = cU_N$ (for Chinchilla $c\approx 20$). When $R_D \ll R^*_D$ and $R_N \ll R^*_N$, our scaling agrees with Chinchilla, and so the point $(U_N,U_D)$, corresponding to $R_D=R_N=0$ is on the optimal compute curve. Increasing $R_D$ by $\epsilon$ corresponds to increasing the number of tokens by $\epsilon U_D = \epsilon c U_N$, while increasing $R_N$ by $\epsilon$ corresponds to increasing the number of parameters by $\epsilon U_N$. For small positive $R_D,R_N$, our curve agrees with Chinchilla and so we need to increase $R_N,R_D$ by the same amount to maintain the proportionality. Hence up to some value $r>0$, the optimal compute curve corresponds to $R_N=R_D=r$. Our curve differs from Chinchilla when $r$ gets closer to either $R^*_N$ or $R^*_D$. At this point, we start to see sharply diminishing returns.</En>
+  <Zh>在我们的情形中，考虑固定计算预算 $C$ 与固定唯一词元预算 $U_D$（意味着一组唯一参数 $U_N$）的设定。设 $R_D$ 为数据重复次数（我们假设处于多 epoch 区间，故 $R_D>0$）。记 $U_D = cU_N$（对 Chinchilla 而言 $c\approx 20$）。当 $R_D \ll R^*_D$ 且 $R_N \ll R^*_N$ 时，我们的缩放与 Chinchilla 一致，因此对应于 $R_D=R_N=0$ 的点 $(U_N,U_D)$ 位于最优计算曲线上。把 $R_D$ 增加 $\epsilon$ 相当于把词元数增加 $\epsilon U_D = \epsilon c U_N$；而把 $R_N$ 增加 $\epsilon$ 相当于把参数量增加 $\epsilon U_N$。对较小的正数 $R_D,R_N$，我们的曲线与 Chinchilla 一致，因此需要等量增加 $R_N,R_D$ 以保持比例。于是在达到某个 $r>0$ 之前，最优计算曲线对应于 $R_N=R_D=r$。当 $r$ 接近 $R^*_N$ 或 $R^*_D$ 时，我们的曲线开始不同于 Chinchilla。此时回报开始急剧递减。</Zh>
 </Para>
 
 <Para>

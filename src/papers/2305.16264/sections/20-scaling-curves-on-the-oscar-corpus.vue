@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:arch" appendix en="Scaling Curves on the OSCAR Corpus" zh="OSCAR 语料库上的缩放曲线" />
+<Heading :level="1" label="sec:fixoscar" appendix en="Scaling Curves on the OSCAR Corpus" zh="OSCAR 语料库上的缩放曲线" />
 
 <Para>
   <En>To ensure our findings are not dataset-dependent, we train models with the same configurations from \autoref{fig:validation} on the OSCAR corpus~\cite{ortiz-suarez-etal-2020-monolingual}. OSCAR is considered noisier than C4~\cite{raffel2020exploring} due to its less stringent duplication. Figures~\ref{fig:validationoscar},\ref{fig:trainingoscar} depict the validation and training loss of these models. We find the trend to be the same as for models trained on C4: While models with fewer repeats have better loss, differences for a few repeats are insignificant.</En>

@@ -1,10 +1,10 @@
 <!-- Hyperparameters and Setup -->
 <script setup lang="ts">
-import { Heading, Para, En, Zh, Equation, Table, Td } from '../../../components/paper'
+import { Heading, Para, En, Zh, Equation, Table, Td, Th } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" appendix en="Hyperparameters and Setup" zh="超参数与设置" />
+<Heading :level="1" label="sec:arch" appendix en="Hyperparameters and Setup" zh="超参数与设置" />
 
 <Para>
   <En>For all training runs we use 1\% of tokens for linear warm-up of the learning rate to a maximum learning rate of 2e-4 that is decayed to 2e-5 following a cosine schedule. We use a batch size of 256 for models with fewer than 2 billion parameters, 512 for models with 2 - 5 billion parameters and 1024 for models with more than 5 billion parameters. All models are trained in bfloat16 precision using the Adam optimizer~\cite{kingma2014adam} with $eps=1e-8$, $beta1=0.9$. For $beta2$, we found a value of $0.95$ to result in slightly lower final loss and fewer loss spikes than the default value of $0.999$ in implementations such as PyTorch. However, except for models with FLOP budgets of $C=9.3 \times 10^{20}$ and $2.1 \times 10^{21}$, we always use $beta2=0.999$. We use a dropout rate of $0.1$, a weight decay rate of $0.1$ and clip gradients at $1.0$. These hyperparameter choices are largely based on prior work~\cite{hoffmann2022training,touvron2023llama} and performance on test runs. As none of our hyperparameter choices is particularly exotic, we expect our setup to generalize to many other setups. In \autoref{tab:all_models} we list the model architectures we use. They are an extended version of the architectures from \cite{hoffmann2022training}. We calculate model parameters following~\cite{narayanan2021efficient}, which includes embedding parameters:</En>
@@ -27,7 +27,182 @@ import { Heading, Para, En, Zh, Equation, Table, Td } from '../../../components/
 <Table label="tab:all_models" caption-en="\textbf{Model architectures.}
 We list the architectures of all models trained as part of this work. Many shown models have been trained multiple times on different amounts of unique data and for varying epochs." caption-zh="\textbf{模型架构。}我们列出本文训练的所有模型的架构。其中许多模型在不同唯一数据量与不同 epoch 数下被多次训练。">
   <tr>
-    <Td align="center">\label{tab:all_models}</Td>
+    <Th align="center" :colspan="2">Parameters (millions) 参数量（百万）</Th>
+    <Th align="center">d_model</Th>
+    <Th align="center">ffw_size</Th>
+    <Th align="center">kv_size</Th>
+    <Th align="center">n_heads</Th>
+    <Th align="center">n_layers</Th>
+  </tr>
+  <tr>
+    <Th align="center">This work</Th>
+    <Th align="center">Chinchilla</Th>
+    <Th align="center" :colspan="5"></Th>
+  </tr>
+  <tr>
+    <Td align="center">7</Td>    <Td align="center">-</Td>    <Td align="center">128</Td>    <Td align="center">512</Td>    <Td align="center">32</Td>    <Td align="center">4</Td>    <Td align="center">3</Td>
+  </tr>
+  <tr>
+    <Td align="center">14</Td>    <Td align="center">-</Td>    <Td align="center">224</Td>    <Td align="center">896</Td>    <Td align="center">32</Td>    <Td align="center">7</Td>    <Td align="center">4</Td>
+  </tr>
+  <tr>
+    <Td align="center">20</Td>    <Td align="center">-</Td>    <Td align="center">288</Td>    <Td align="center">1152</Td>    <Td align="center">32</Td>    <Td align="center">7</Td>    <Td align="center">5</Td>
+  </tr>
+  <tr>
+    <Td align="center">38</Td>    <Td align="center">-</Td>    <Td align="center">448</Td>    <Td align="center">1792</Td>    <Td align="center">32</Td>    <Td align="center">7</Td>    <Td align="center">6</Td>
+  </tr>
+  <tr>
+    <Td align="center">52</Td>    <Td align="center">44</Td>    <Td align="center">512</Td>    <Td align="center">2048</Td>    <Td align="center">64</Td>    <Td align="center">8</Td>    <Td align="center">8</Td>
+  </tr>
+  <tr>
+    <Td align="center">66</Td>    <Td align="center">57</Td>    <Td align="center">576</Td>    <Td align="center">2304</Td>    <Td align="center">64</Td>    <Td align="center">9</Td>    <Td align="center">9</Td>
+  </tr>
+  <tr>
+    <Td align="center">83</Td>    <Td align="center">74</Td>    <Td align="center">640</Td>    <Td align="center">2560</Td>    <Td align="center">64</Td>    <Td align="center">10</Td>    <Td align="center">10</Td>
+  </tr>
+  <tr>
+    <Td align="center">97</Td>    <Td align="center">90</Td>    <Td align="center">640</Td>    <Td align="center">2560</Td>    <Td align="center">64</Td>    <Td align="center">10</Td>    <Td align="center">13</Td>
+  </tr>
+  <tr>
+    <Td align="center">112</Td>    <Td align="center">106</Td>    <Td align="center">640</Td>    <Td align="center">2560</Td>    <Td align="center">64</Td>    <Td align="center">10</Td>    <Td align="center">16</Td>
+  </tr>
+  <tr>
+    <Td align="center">125</Td>    <Td align="center">117</Td>    <Td align="center">768</Td>    <Td align="center">3072</Td>    <Td align="center">64</Td>    <Td align="center">12</Td>    <Td align="center">12</Td>
+  </tr>
+  <tr>
+    <Td align="center">146</Td>    <Td align="center">140</Td>    <Td align="center">768</Td>    <Td align="center">3072</Td>    <Td align="center">64</Td>    <Td align="center">12</Td>    <Td align="center">15</Td>
+  </tr>
+  <tr>
+    <Td align="center">168</Td>    <Td align="center">163</Td>    <Td align="center">768</Td>    <Td align="center">3072</Td>    <Td align="center">64</Td>    <Td align="center">12</Td>    <Td align="center">18</Td>
+  </tr>
+  <tr>
+    <Td align="center">182</Td>    <Td align="center">175</Td>    <Td align="center">896</Td>    <Td align="center">3584</Td>    <Td align="center">64</Td>    <Td align="center">14</Td>    <Td align="center">14</Td>
+  </tr>
+  <tr>
+    <Td align="center">201</Td>    <Td align="center">196</Td>    <Td align="center">896</Td>    <Td align="center">3584</Td>    <Td align="center">64</Td>    <Td align="center">14</Td>    <Td align="center">16</Td>
+  </tr>
+  <tr>
+    <Td align="center">220</Td>    <Td align="center">217</Td>    <Td align="center">896</Td>    <Td align="center">3584</Td>    <Td align="center">64</Td>    <Td align="center">14</Td>    <Td align="center">18</Td>
+  </tr>
+  <tr>
+    <Td align="center">255</Td>    <Td align="center">251</Td>    <Td align="center">1024</Td>    <Td align="center">4096</Td>    <Td align="center">64</Td>    <Td align="center">16</Td>    <Td align="center">16</Td>
+  </tr>
+  <tr>
+    <Td align="center">280</Td>    <Td align="center">278</Td>    <Td align="center">1024</Td>    <Td align="center">4096</Td>    <Td align="center">64</Td>    <Td align="center">16</Td>    <Td align="center">18</Td>
+  </tr>
+  <tr>
+    <Td align="center">305</Td>    <Td align="center">306</Td>    <Td align="center">1024</Td>    <Td align="center">4096</Td>    <Td align="center">64</Td>    <Td align="center">16</Td>    <Td align="center">20</Td>
+  </tr>
+  <tr>
+    <Td align="center">421</Td>    <Td align="center">425</Td>    <Td align="center">1280</Td>    <Td align="center">5120</Td>    <Td align="center">128</Td>    <Td align="center">10</Td>    <Td align="center">18</Td>
+  </tr>
+  <tr>
+    <Td align="center">480</Td>    <Td align="center">489</Td>    <Td align="center">1280</Td>    <Td align="center">5120</Td>    <Td align="center">128</Td>    <Td align="center">10</Td>    <Td align="center">21</Td>
+  </tr>
+  <tr>
+    <Td align="center">502</Td>    <Td align="center">509</Td>    <Td align="center">1408</Td>    <Td align="center">5632</Td>    <Td align="center">128</Td>    <Td align="center">11</Td>    <Td align="center">18</Td>
+  </tr>
+  <tr>
+    <Td align="center">539</Td>    <Td align="center">552</Td>    <Td align="center">1280</Td>    <Td align="center">5120</Td>    <Td align="center">128</Td>    <Td align="center">10</Td>    <Td align="center">24</Td>
+  </tr>
+  <tr>
+    <Td align="center">574</Td>    <Td align="center">587</Td>    <Td align="center">1408</Td>    <Td align="center">5632</Td>    <Td align="center">128</Td>    <Td align="center">11</Td>    <Td align="center">21</Td>
+  </tr>
+  <tr>
+    <Td align="center">619</Td>    <Td align="center">632</Td>    <Td align="center">1536</Td>    <Td align="center">6144</Td>    <Td align="center">128</Td>    <Td align="center">12</Td>    <Td align="center">19</Td>
+  </tr>
+  <tr>
+    <Td align="center">645</Td>    <Td align="center">664</Td>    <Td align="center">1408</Td>    <Td align="center">5632</Td>    <Td align="center">128</Td>    <Td align="center">11</Td>    <Td align="center">24</Td>
+  </tr>
+  <tr>
+    <Td align="center">704</Td>    <Td align="center">724</Td>    <Td align="center">1536</Td>    <Td align="center">6144</Td>    <Td align="center">128</Td>    <Td align="center">12</Td>    <Td align="center">22</Td>
+  </tr>
+  <tr>
+    <Td align="center">789</Td>    <Td align="center">816</Td>    <Td align="center">1536</Td>    <Td align="center">6144</Td>    <Td align="center">128</Td>    <Td align="center">12</Td>    <Td align="center">25</Td>
+  </tr>
+  <tr>
+    <Td align="center">865</Td>    <Td align="center">893</Td>    <Td align="center">1792</Td>    <Td align="center">7168</Td>    <Td align="center">128</Td>    <Td align="center">14</Td>    <Td align="center">20</Td>
+  </tr>
+  <tr>
+    <Td align="center">981</Td>    <Td align="center">1018</Td>    <Td align="center">1792</Td>    <Td align="center">7168</Td>    <Td align="center">128</Td>    <Td align="center">14</Td>    <Td align="center">23</Td>
+  </tr>
+  <tr>
+    <Td align="center">1096</Td>    <Td align="center">1143</Td>    <Td align="center">1792</Td>    <Td align="center">7168</Td>    <Td align="center">128</Td>    <Td align="center">14</Td>    <Td align="center">26</Td>
+  </tr>
+  <tr>
+    <Td align="center">1215</Td>    <Td align="center">1266</Td>    <Td align="center">2048</Td>    <Td align="center">8192</Td>    <Td align="center">128</Td>    <Td align="center">16</Td>    <Td align="center">22</Td>
+  </tr>
+  <tr>
+    <Td align="center">1364</Td>    <Td align="center">1424</Td>    <Td align="center">2176</Td>    <Td align="center">8704</Td>    <Td align="center">128</Td>    <Td align="center">17</Td>    <Td align="center">22</Td>
+  </tr>
+  <tr>
+    <Td align="center">1366</Td>    <Td align="center">1429</Td>    <Td align="center">2048</Td>    <Td align="center">8192</Td>    <Td align="center">128</Td>    <Td align="center">16</Td>    <Td align="center">25</Td>
+  </tr>
+  <tr>
+    <Td align="center">1517</Td>    <Td align="center">1593</Td>    <Td align="center">2048</Td>    <Td align="center">8192</Td>    <Td align="center">128</Td>    <Td align="center">16</Td>    <Td align="center">28</Td>
+  </tr>
+  <tr>
+    <Td align="center">1535</Td>    <Td align="center">1609</Td>    <Td align="center">2176</Td>    <Td align="center">8704</Td>    <Td align="center">128</Td>    <Td align="center">17</Td>    <Td align="center">25</Td>
+  </tr>
+  <tr>
+    <Td align="center">1650</Td>    <Td align="center">1731</Td>    <Td align="center">2304</Td>    <Td align="center">9216</Td>    <Td align="center">128</Td>    <Td align="center">18</Td>    <Td align="center">24</Td>
+  </tr>
+  <tr>
+    <Td align="center">1706</Td>    <Td align="center">1794</Td>    <Td align="center">2176</Td>    <Td align="center">8704</Td>    <Td align="center">128</Td>    <Td align="center">17</Td>    <Td align="center">28</Td>
+  </tr>
+  <tr>
+    <Td align="center">1905</Td>    <Td align="center">2007</Td>    <Td align="center">2304</Td>    <Td align="center">9216</Td>    <Td align="center">128</Td>    <Td align="center">18</Td>    <Td align="center">28</Td>
+  </tr>
+  <tr>
+    <Td align="center">2160</Td>    <Td align="center">2283</Td>    <Td align="center">2304</Td>    <Td align="center">9216</Td>    <Td align="center">128</Td>    <Td align="center">18</Td>    <Td align="center">32</Td>
+  </tr>
+  <tr>
+    <Td align="center">2179</Td>    <Td align="center">2298</Td>    <Td align="center">2560</Td>    <Td align="center">10240</Td>    <Td align="center">128</Td>    <Td align="center">20</Td>    <Td align="center">26</Td>
+  </tr>
+  <tr>
+    <Td align="center">2494</Td>    <Td align="center">2639</Td>    <Td align="center">2560</Td>    <Td align="center">10240</Td>    <Td align="center">128</Td>    <Td align="center">20</Td>    <Td align="center">30</Td>
+  </tr>
+  <tr>
+    <Td align="center">2809</Td>    <Td align="center">2980</Td>    <Td align="center">2560</Td>    <Td align="center">10240</Td>    <Td align="center">128</Td>    <Td align="center">20</Td>    <Td align="center">34</Td>
+  </tr>
+  <tr>
+    <Td align="center">3090</Td>    <Td align="center">-</Td>    <Td align="center">2688</Td>    <Td align="center">10752</Td>    <Td align="center">128</Td>    <Td align="center">22</Td>    <Td align="center">34</Td>
+  </tr>
+  <tr>
+    <Td align="center">3263</Td>    <Td align="center">3530</Td>    <Td align="center">2688</Td>    <Td align="center">10752</Td>    <Td align="center">128</Td>    <Td align="center">21</Td>    <Td align="center">36</Td>
+  </tr>
+  <tr>
+    <Td align="center">3574</Td>    <Td align="center">3802</Td>    <Td align="center">2816</Td>    <Td align="center">11264</Td>    <Td align="center">128</Td>    <Td align="center">22</Td>    <Td align="center">36</Td>
+  </tr>
+  <tr>
+    <Td align="center">3900</Td>    <Td align="center">4084</Td>    <Td align="center">2944</Td>    <Td align="center">11776</Td>    <Td align="center">128</Td>    <Td align="center">23</Td>    <Td align="center">36</Td>
+  </tr>
+  <tr>
+    <Td align="center">4239</Td>    <Td align="center">4516</Td>    <Td align="center">3072</Td>    <Td align="center">12288</Td>    <Td align="center">128</Td>    <Td align="center">24</Td>    <Td align="center">36</Td>
+  </tr>
+  <tr>
+    <Td align="center">6355</Td>    <Td align="center">6796</Td>    <Td align="center">3584</Td>    <Td align="center">14336</Td>    <Td align="center">128</Td>    <Td align="center">28</Td>    <Td align="center">40</Td>
+  </tr>
+  <tr>
+    <Td align="center">8672</Td>    <Td align="center">9293</Td>    <Td align="center">4096</Td>    <Td align="center">16384</Td>    <Td align="center">128</Td>    <Td align="center">32</Td>    <Td align="center">42</Td>
+  </tr>
+  <tr>
+    <Td align="center">10912</Td>    <Td align="center">11452</Td>    <Td align="center">4352</Td>    <Td align="center">17408</Td>    <Td align="center">128</Td>    <Td align="center">32</Td>    <Td align="center">47</Td>
+  </tr>
+  <tr>
+    <Td align="center">11455</Td>    <Td align="center">12295</Td>    <Td align="center">4608</Td>    <Td align="center">18432</Td>    <Td align="center">128</Td>    <Td align="center">36</Td>    <Td align="center">44</Td>
+  </tr>
+  <tr>
+    <Td align="center">12220</Td>    <Td align="center">12569</Td>    <Td align="center">4608</Td>    <Td align="center">18432</Td>    <Td align="center">128</Td>    <Td align="center">32</Td>    <Td align="center">47</Td>
+  </tr>
+  <tr>
+    <Td align="center">13601</Td>    <Td align="center">13735</Td>    <Td align="center">4864</Td>    <Td align="center">19456</Td>    <Td align="center">128</Td>    <Td align="center">32</Td>    <Td align="center">47</Td>
+  </tr>
+  <tr>
+    <Td align="center">14917</Td>    <Td align="center">14940</Td>    <Td align="center">4992</Td>    <Td align="center">19968</Td>    <Td align="center">128</Td>    <Td align="center">32</Td>    <Td align="center">49</Td>
+  </tr>
+  <tr>
+    <Td align="center">15056</Td>    <Td align="center">16183</Td>    <Td align="center">5120</Td>    <Td align="center">20480</Td>    <Td align="center">128</Td>    <Td align="center">40</Td>    <Td align="center">47</Td>
   </tr>
 </Table>
 </template>

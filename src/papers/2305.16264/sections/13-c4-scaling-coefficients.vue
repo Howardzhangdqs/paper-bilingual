@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Equation } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:downrep" appendix en="C4 Scaling Coefficients" zh="C4 缩放系数" />
+<Heading :level="1" label="sec:c4scaling" appendix en="C4 Scaling Coefficients" zh="C4 缩放系数" />
 
 <Para>
   <En>While \citet{hoffmann2022training} have shown that the equal scaling of model parameters and training tokens holds across different training datasets, the precise ratios vary considerably across datasets and approaches. For example given the Gopher~\cite{rae2021scaling} compute budget of $5.76 \times 10^{23}$ FLOPs, their parametric loss function fitted on MassiveWeb predicts an optimal allocation of 40 billion parameters. Meanwhile, if the training dataset is C4~\cite{raffel2020exploring} their IsoFLOP approach predicts 73 billion parameters to be optimal, almost twice as much. However, for C4, which is our training dataset, they do not provide the coefficients necessary to compute loss with their parametric loss function. Based on their IsoFLOP training runs on C4, they only provide the information that for C4, compute ($C$) allocated to data ($D$) and parameters ($N$) should be scaled \emph{exactly} equally for optimality, i.e. $a=b=0.5$ in the relationship $N_{opt} \propto C^a$ and $D_{opt} \propto C^b$. This corresponds to $\alpha=\beta$ in the parametric loss function (\autoref{eq:ccbase}). Thus, we use this information together with the methodology and C4 data points from \cite{hoffmann2022training} to fit the parametric loss function. We tie the parameters $\alpha$ and $\beta$ to be equal and optimize</En>
@@ -19,7 +19,7 @@ import { Heading, Para, En, Zh, Equation } from '../../../components/paper'
   <Zh>其中 $\text{LSE}$ 为 log-sum-exp 算子，$N_i$、$D_i$ 与 $L_i$ 分别为第 $i$ 次运行的模型规模、数据集规模与损失，$\delta = 10^{-3}$。我们在 54 个样本上拟合，初始值取自网格：$\alpha \in \{0., 0.5,\dots, 2. \}$、$\beta \in \{ 0., 0.5,\dots, 2.\}$、$e \in \{-1., -.5, \dots, 1. \}$、$a \in \{0, 5, \dots, 25 \}$、$b \in \{0, 5, \dots, 25 \}$。 拟合结果为 $a=6.255414$、$b=7.3049974$、$e=0.6254804$、$\alpha=\beta=0.3526596$。对 $a$、$b$、$e$ 取指数得到 $A$、$B$、$E$，并把所有学得的系数代入 \autoref{eq:ccbase}，即可把损失（$L$）表示为参数量与数据的函数：</Zh>
 </Para>
 
-<Equation latex="L(N, D) = 1.87 + \frac{521}{N^{0.353}} + \frac{1488}{D^{0.353}}"
+<Equation :numbered="false" latex="L(N, D) = 1.87 + \frac{521}{N^{0.353}} + \frac{1488}{D^{0.353}}"
   :tips="{ L: '交叉熵损失（C4 上的拟合）', N: '模型参数量', D: '训练词元数', '1.87': '不可约损失下限 E', '521': '参数项系数 A', '1488': '数据项系数 B', '0.353': '幂律指数 α=β' }" />
 
 <Para>

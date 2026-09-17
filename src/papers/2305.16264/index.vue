@@ -51,7 +51,6 @@ import S35 from './sections/35-broader-impacts.vue'
     :cites="cites"
     :references="references"
     :macros="{ '\\argmin': '\\operatorname*{argmin}' }"
-  :extra-labels="{'eq:multiphop-optimum': '20', 'sec:parametricfit': '§3.1', 'sec:scalinglaws': '§C', 'sec:c4scaling': '§D', 'sec:addcon': '§E', 'sec:dd': '§F', 'sec:toomany': '§H', 'sec:galactica': '§I', 'sec:trainlossc4': '§J', 'sec:fixoscar': '§K', 'eval:anlir1': 'Table 16', 'eval:anlir2': 'Table 17', 'eval:anlir3': 'Table 18', 'eval:arcc': 'Table 19', 'eval:arce': 'Table 20', 'eval:boolq': 'Table 21', 'eval:cb': 'Table 22', 'eval:copa': 'Table 23', 'eval:hellaswag': 'Table 24', 'eval:piqa': 'Table 25', 'eval:rte': 'Table 26', 'eval:sciq': 'Table 27', 'eval:storycloze': 'Table 28', 'eval:winogrande': 'Table 29', 'eval:e2enlg': 'Table 30', 'eval:xsum': 'Table 31', 'eval:webnlg': 'Table 32', 'eval:wikilingua': 'Table 33', 'eval:babi': 'Table 34'}"
   >
     <S01 />
     <S02 />

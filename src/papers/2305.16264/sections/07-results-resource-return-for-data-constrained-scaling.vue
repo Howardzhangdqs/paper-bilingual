@@ -4,7 +4,7 @@ import { Heading, Para, En, Zh, Figure } from '../../../components/paper'
 </script>
 
 <template>
-<Heading :level="1" label="sec:beyond" en="Results: Resource Return for Data-Constrained Scaling" zh="结果：数据受限扩展的资源回报" />
+<Heading :level="1" label="sec:fixc" en="Results: Resource Return for Data-Constrained Scaling" zh="结果：数据受限扩展的资源回报" />
 
 <Figure src="figures/2305.16264/dualplot.svg" :width="100" label="fig:epochs" caption-en="\textbf{Empirical and Extrapolated loss with constrained data.} \textit{(Left):} Loss as a function of repeated tokens for three different training budgets each with fixed number of parameters. Loss curves predicted by our data-constrained scaling laws are shifted to exactly match the loss at 100\% unique data. Return on FLOPs decays with repeated data in a regular pattern. \textit{(Right):} Extrapolating from the proposed data-constrained  scaling law shows that
         at small numbers epochs are benign, but at large number of epochs loss stops improving." caption-zh="\textbf{数据受限下的实测损失与外推损失。}\textit{（左）：}三个不同训练预算（各自参数量固定）下损失随重复词元数的变化。我们数据受限缩放定律预测的损失曲线经过平移，使其在 100\% 唯一数据处与实测损失完全吻合。FLOPs 的回报随数据重复呈规律性衰减。\textit{（右）：}由所提数据受限缩放定律外推可知，epoch 数较小时其影响是良性的，而 epoch 数很大时损失不再改善。" />
