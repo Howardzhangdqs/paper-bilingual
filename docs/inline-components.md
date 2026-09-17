@@ -5,7 +5,9 @@ agent 在论文 sections/*.vue 的字符串字段（`en`/`zh`/`captionEn`/表格
 对应的 Vue 组件。写作时不需要写任何 HTML——保持与 LaTeX 源码几乎一致的
 书写习惯即可。
 
-组件源码位于 `src/components/inline/`，行为对齐 LaTeX PDF（hyperref）。
+组件源码位于 `src/components/inline/`，行为对齐 LaTeX PDF（hyperref）；
+悬停/触摸的预览卡片由 [RefTipLayer.vue](../src/components/paper/RefTipLayer.vue)
+（[refPreview.ts](../src/components/paper/refPreview.ts)）全局提供。
 
 ## 文献引用
 
@@ -17,8 +19,9 @@ Chinchilla~\citep{hoffmann2022training} shows ...   % \citep/\citet 同义
 
 | 组件 | [CiteLink](../src/components/inline/CiteLink.vue) |
 |---|---|
-| 渲染 | 蓝色上标 `[42]`（编号按 references 顺序） |
-| 交互 | **点击平滑滚动到文末 References 列表的对应条目并金色高亮 1.4s**；悬停显示 cite key |
+| 渲染 | 蓝色上标 `[42]`（编号按 references 顺序）；无编号映射时显示 key 原文 |
+| 交互 | **点击平滑滚动到文末 References 列表的对应条目并金色高亮 1.4s**；悬停约 150ms 弹出预览卡显示条目内容（带 ↑上文/↓下文 方向指示）；合并的多引用（`[1, 2]`）各数字独立跳转与预览 |
+| 触摸 | 无悬停的设备两段式：首击显示预览卡（卡内「点我跳转」按钮或再点一次该数字），二击跳转 |
 | 数据 | `cites.json` + `references.json`（scripts/extract_cites.py 生成） |
 
 ## 交叉引用
@@ -33,8 +36,9 @@ following (\ref{eq:base}) 或~\eqref{eq:base} ...    % 公式引用带括号
 | 组件 | [RefLink](../src/components/inline/RefLink.vue) |
 |---|---|
 | 渲染 | 英文栏 `Figure 2`、`§4.1`、`Table 3`、`Equation 14`；**中文栏自动显示 `图 2`、`表 3`、`式 14`**（`eqref` 显示 `（12）`）；**章节引用自动附章节名：`§4.1 Method` / `§4.1 方法`**（取该 `Heading` 的 `en`/`zh`） |
-| 交互 | **点击平滑滚动到对应的图/表/公式/章节并金色高亮** |
-| 前提 | 目标块上写 `label` 字段（照抄 LaTeX 的 `\label` key），编号、锚点与章节名由框架自动推导 |
+| 交互 | **点击平滑滚动到对应的图/表/公式/章节并金色高亮**——章节跳到页面顶部（与目录一致），图/表/公式居中展示；悬停约 150ms 弹出预览卡：公式显示整段 KaTeX、图表显示中英题注、章节显示中文标题 + 首块正文摘要（卡片带 ↑上文/↓下文 方向指示） |
+| 触摸 | 两段式：首击显示预览卡（卡内「点我跳转」按钮或再点一次该链接），二击跳转 |
+| 前提 | 目标块上写 `label` 字段（照抄 LaTeX 的 `\label` key），编号、锚点与章节名由框架自动推导；目标章节尚未渐进挂载时框架会先补挂全文再跳转 |
 
 ## 外部链接
 
@@ -84,27 +88,34 @@ KaTeX 渲染；论文 preamble 的 `\newcommand` 写进 index.vue 的 `macros`
 - 键前不能紧邻字母（防误配命令名内部），键后不能紧跟字母；连写变量
   （如 `12lh^2` 中的 `l`）匹配不到，可给整段 `12lh^2` 或改用组合键。
 - 释义写一句话（20 字左右），说明该符号在本文中的含义即可；带释义的
-  符号自动显示浅蓝点状下划线，悬停加深并弹卡片。
-- 公式块左上角自动提供两个小按钮（框架行为，无需写作）：**展开全部
+  符号自动显示浅蓝点状下划线，悬停加深并弹卡片（触摸设备点按符号
+  显示/隐藏）；释义文字里的 LaTeX 片段（如 `R_N^*`、`\alpha`）自动用
+  KaTeX 渲染。
+- 公式块右上角自动提供两个小按钮（框架行为，无需写作）：**展开全部
   释义**（面板出现在公式左侧，左右分屏布局，默认展开）与**复制
   LaTeX 源码**；无 tips 的公式只有复制按钮。连续排布的公式（中间无
   其他内容块）自动合并为一个块：共享一个符号释义面板与一组工具
-  按钮，符号按出现顺序去重，复制按钮复制整组 LaTeX 源码。
+  按钮，符号按出现顺序去重，复制按钮复制整组 LaTeX 源码（多条公式
+  以空行分隔）。
 - 实现见 [tips.ts](../src/components/paper/tips.ts)（LaTeX 改写 + 注册表）
-  与 [TipLayer.vue](../src/components/paper/TipLayer.vue)（全局悬浮卡片）。
+  与 [TipLayer.vue](../src/components/paper/TipLayer.vue)（符号释义悬浮卡）。
 
 ## 强调与脚注
 
 ```latex
 \textbf{大语言模型}（LLM）...       % 加粗
 \emph{effective data} ...           % 强调（斜体）
-... 详见\footnote{https://...} ...  % 上标 †，悬停显示内容
+... 详见\footnote{https://...} ...  % 上标 †，悬停显示预览卡
+                                      % （文本里的 $..$ 数学照常渲染，
+                                      %   触摸设备点按直接显示）
 ```
 
 ## 转义与杂项
 
-`\%` `\&` `\_` `\#` `\$` 输出字符本身；`~` 为不断行空格；`---` 为 em dash；
-`\v{r}`→ř、`\c{c}`→ç 等变音符号已支持。
+`\%` `\&` `\_` `\#` `\$` `\{` `\}` 输出字符本身；`~` 为不断行空格；
+`--` 为 en dash、`---` 为 em dash；`` `` `` 与 `''` 排版为弯引号；
+`\dots` 为 …；`\v{r}`→ř、`\c{c}`→ç、`\'e`→é 等变音符号已支持；
+`\texttt{...}` 等宽、`\underline{...}` 下划线、`\textsc{...}` 小型大写。
 
 ## 未识别命令的处理
 
