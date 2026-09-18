@@ -5,7 +5,7 @@
  * 章节编号（§x / §A.1）由框架按出现顺序自动推导。
  */
 import { computed } from 'vue'
-import { useRegister } from './registry'
+import { useNextHeadingId, useRegister } from './registry'
 
 const props = withDefaults(
   defineProps<{
@@ -20,7 +20,16 @@ const props = withDefaults(
   { level: 1, toc: true },
 )
 
-const item = useRegister({ type: 'heading', level: props.level, label: props.label, appendix: props.appendix, toc: props.toc })
+/* 锚点 id 优先用编译期目录分配的静态 id（scripts/gen_toc.mjs，与目录
+   对齐且 URL 稳定）；无静态数据时回退运行时顺序号 */
+const item = useRegister({
+  type: 'heading',
+  id: useNextHeadingId(),
+  level: props.level,
+  label: props.label,
+  appendix: props.appendix,
+  toc: props.toc,
+})
 item.titleEn = props.en
 item.titleZh = props.zh
 const domId = item.id

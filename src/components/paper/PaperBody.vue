@@ -10,9 +10,10 @@
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import type { PaperMeta } from '../../types'
+import type { PaperMeta, TocEntry } from '../../types'
 import { immersive } from '../../immersive'
 import { settings } from '../../settings'
+import { paperTocById } from '../../data/registry'
 import RichText from '../RichText'
 import { makeRenderCtx, provideLazyMount, providePaper, useToc } from './registry'
 import { jumpTo, resetJump } from './scroll'
@@ -34,10 +35,27 @@ const paperCtx = providePaper({
   cites: props.cites,
   macros: props.macros,
   extraLabels: props.extraLabels,
+  /* 编译期目录的锚点 id 表：Heading 按注册顺序领取，DOM 与目录对齐 */
+  headingIds: paperTocById[props.meta.id]?.headingIds,
 })
 const ctx = paperCtx.ctx
 const rctx = makeRenderCtx(paperCtx.derived, paperCtx.data)
-const toc = useToc(ctx)
+
+/* 目录数据源：编译期静态目录优先（scripts/gen_toc.mjs 生成，随主包
+   eager 加载，进页即完整，不随正文渐进挂载逐步补齐）；未生成的论文
+   回退运行时注册表推导（形态与静态条目一致） */
+const runtimeToc = useToc(ctx)
+const toc = computed<TocEntry[]>(() => {
+  const staticToc = paperTocById[props.meta.id]?.toc
+  if (staticToc) return staticToc
+  return runtimeToc.value.map((h) => ({
+    domId: h.domId,
+    level: (h.item.level ?? 1) as 1 | 2,
+    number: h.number,
+    titleEn: h.item.titleEn,
+    titleZh: h.item.titleZh,
+  }))
+})
 
 const referenceItems = computed(() => {
   if (!props.references) return []
@@ -52,8 +70,9 @@ const activeId = ref('')
 /* 渐进挂载：整篇论文 4 万+ DOM 节点、近千个公式一次性同步挂载是一个
    秒级长任务（点击后白屏等待）。改为首批章节同步挂载，其余在滚动临近
    （哨兵 IntersectionObserver）或浏览器空闲时分小批挂载——首屏立即可
-   读，后续批次也不卡交互；图表公式编号与目录随挂载逐步收敛，跳转到
-   尚未挂载的目标时由 ensureMounted 立即补齐 */
+   读，后续批次也不卡交互；图表公式编号随挂载逐步收敛（目录为编译期
+   静态数据，进页即完整），跳转到尚未挂载的目标时由 ensureMounted
+   立即补齐 */
 const slots = useSlots()
 /** slot 子节点里的章节组件（过滤注释/空白等非组件 vnode） */
 const children = computed(() =>
@@ -171,7 +190,7 @@ let lastSectionIdx = -1
 let lastLabelAt = 0
 function updateTopbarSection() {
   const idx = toc.value.findIndex((h) => h.domId === activeId.value)
-  const item = idx >= 0 ? toc.value[idx].item : undefined
+  const item = toc.value[idx]
   const label = item
     ? settings.lang === 'zh' && item.titleZh
       ? item.titleZh
@@ -278,9 +297,9 @@ watch(toc, () => updateActive())
         <li v-for="h in toc" :key="h.domId">
           <a
             :href="`#${h.domId}`"
-            :class="[`lvl-${h.item.level}`, { current: activeId === h.domId }]"
+            :class="[`lvl-${h.level}`, { current: activeId === h.domId }]"
             @click.prevent="scrollToId(h.domId)"
-            >{{ settings.lang === 'zh' && h.item.titleZh ? h.item.titleZh : h.item.titleEn }}</a>
+            >{{ settings.lang === 'zh' && h.titleZh ? h.titleZh : h.titleEn }}</a>
         </li>
       </ol>
     </aside>

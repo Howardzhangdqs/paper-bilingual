@@ -13,3 +13,18 @@ export interface PaperMeta {
   year?: number
   arxivUrl?: string
 }
+
+/**
+ * 左侧目录条目。编译期由 scripts/gen_toc.mjs 从 sections/*.vue 的
+ * <Heading> 字面量提取（toc.generated.ts，随主包 eager 加载，进页即
+ * 完整）；未生成静态目录的论文由运行时注册表推导出同形数据兜底。
+ */
+export interface TocEntry {
+  /** DOM 锚点 id（Heading 按注册顺序领取的静态 id） */
+  domId: string
+  level: 1 | 2
+  /** 章节号（"3"、"3.1"、"A"），推导规则与 registry.ts 的 useToc 一致 */
+  number: string
+  titleEn?: string
+  titleZh?: string
+}

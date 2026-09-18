@@ -508,6 +508,42 @@ html.immersive .settings-wrap {
 .paper-header .venue { font-size: 13.5px; color: var(--muted); margin-top: 4px; }
 .paper-header .venue a { margin-left: 8px; }
 
+/* 首页卡片 ⇄ 论文页头部的共享元素过渡（View Transitions API）：论文页
+   头部常驻过渡名作落点；首页卡片同名由 paperTransition.ts 在点击/
+   回程时动态打标（名字须全页唯一，不能静态标在所有卡片上）。
+   节奏设计：组盒（位置/尺寸飞移）0.5s 缓出，依次错开 30ms 接力；
+   旧快照 0.15s 快速淡出、新快照延迟到飞行后半程才淡入——读作「元素
+   飞过去落定」，而非两份文字长期叠影交叉淡化（默认等长交叉淡化的观感） */
+.paper-header h1 { view-transition-name: vt-title-en; }
+.paper-header .zh-title { view-transition-name: vt-title-zh; }
+.paper-header .authors { view-transition-name: vt-authors; }
+.paper-header .venue { view-transition-name: vt-venue; }
+::view-transition-group(vt-title-en),
+::view-transition-group(vt-title-zh),
+::view-transition-group(vt-authors),
+::view-transition-group(vt-venue) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+::view-transition-group(vt-title-zh) { animation-delay: 0.03s; }
+::view-transition-group(vt-authors) { animation-delay: 0.06s; }
+::view-transition-group(vt-venue) { animation-delay: 0.09s; }
+::view-transition-old(vt-title-en),
+::view-transition-old(vt-title-zh),
+::view-transition-old(vt-authors),
+::view-transition-old(vt-venue) {
+  animation-duration: 0.15s;
+  animation-timing-function: ease-out;
+}
+::view-transition-new(vt-title-en),
+::view-transition-new(vt-title-zh),
+::view-transition-new(vt-authors),
+::view-transition-new(vt-venue) {
+  animation-delay: 0.14s;
+  animation-duration: 0.34s;
+  animation-timing-function: ease-in-out;
+}
+
 /* ---------- 双栏对照行 ---------- */
 
 .pair-row {

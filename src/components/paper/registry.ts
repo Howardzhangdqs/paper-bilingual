@@ -67,6 +67,8 @@ export interface PaperDerived {
 interface PaperContext {
   items: RegItem[]
   seq: { n: number }
+  /** Heading 按注册顺序领取编译期生成的静态锚点 id（见 useNextHeadingId） */
+  nextHeadingId: () => string | undefined
 }
 
 const CTX_KEY: InjectionKey<PaperContext> = Symbol('paper-ctx')
@@ -81,6 +83,10 @@ export interface PaperData {
   macros?: Record<string, string>
   /** 显式覆盖自动推导的 label 编号（一般留空） */
   extraLabels?: Record<string, string>
+  /** 编译期目录产物里的全部 Heading 锚点 id（toc.generated.ts，模板
+     顺序）。传入后 Heading 的 DOM id 与静态目录严格对齐；缺省回退
+     运行时顺序号 pblk-N */
+  headingIds?: string[]
 }
 
 export function providePaper(data: PaperData = {}): {
@@ -88,7 +94,14 @@ export function providePaper(data: PaperData = {}): {
   data: PaperData
   derived: Ref<PaperDerived>
 } {
-  const ctx: PaperContext = reactive({ items: [], seq: { n: 0 } }) as PaperContext
+  let headingCursor = 0
+  const ctx: PaperContext = reactive({
+    items: [],
+    seq: { n: 0 },
+    /* 渐进挂载也严格按 section 模板顺序挂载，注册顺序 = 模板顺序，
+       逐个领取即可与静态 id 表一一对齐 */
+    nextHeadingId: () => data.headingIds?.[headingCursor++],
+  }) as PaperContext
   provide(CTX_KEY, ctx)
   provide(DATA_KEY, data)
   const derived = computed<PaperDerived>(() => {
@@ -222,6 +235,12 @@ export function makeRenderCtx(
 export function useRenderCtx(): Ref<import('../../richtext').RenderCtx> {
   const { data, derived } = usePaperData()
   return makeRenderCtx(derived, data)
+}
+
+/** Heading 用：按注册顺序领取编译期生成的静态锚点 id（与目录对齐）；
+ *  无静态数据时返回 undefined，useRegister 回退运行时顺序号 */
+export function useNextHeadingId(): string | undefined {
+  return inject(CTX_KEY)?.nextHeadingId()
 }
 
 /** 写作组件用：注册自身，返回 DOM id 与卸载清理函数 */

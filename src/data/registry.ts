@@ -9,17 +9,32 @@
  * 主页与路由自动生效，无需手动注册。
  */
 import type { Component } from 'vue'
-import type { PaperMeta } from '../types'
+import type { PaperMeta, TocEntry } from '../types'
 
 export interface PaperModule {
   default: Component
   meta: PaperMeta
 }
 
+/** 编译期目录产物（scripts/gen_toc.mjs 生成，随主包 eager 加载） */
+export interface PaperTocData {
+  /** 全部 <Heading> 的锚点 id（模板顺序，Heading 运行时按序领取） */
+  headingIds: string[]
+  /** 左侧目录条目（进页即完整，不随正文渐进挂载补齐） */
+  toc: TocEntry[]
+}
+
 /** meta.ts eager 加载：文件极小（纯数据），主页列表直接可用 */
 const metaModules = import.meta.glob('../papers/*/meta.ts', { eager: true }) as Record<
   string,
   { meta: PaperMeta }
+>
+
+/** 目录产物 eager 加载：目录数据只有几 KB，进主包换取「进页即完整」，
+   不用等正文 chunk 下载与渐进挂载 */
+const tocModules = import.meta.glob('../papers/*/toc.generated.ts', { eager: true }) as Record<
+  string,
+  PaperTocData
 >
 
 /** index.vue 懒加载：路由进入该论文时才下载并编译正文组件 */
@@ -47,3 +62,8 @@ export const paperMetaById: Record<string, PaperMeta> = Object.fromEntries(
 /** 论文 ID -> 正文组件的动态加载器（无该论文时为 undefined） */
 export const paperLoaders: Record<string, (() => Promise<PaperModule>) | undefined> =
   Object.fromEntries(Object.entries(moduleLoaders).map(([path, load]) => [idOf(path), load]))
+
+/** 论文 ID -> 编译期目录（未跑生成脚本的论文无条目，运行时兜底推导） */
+export const paperTocById: Record<string, PaperTocData | undefined> = Object.fromEntries(
+  Object.entries(tocModules).map(([path, data]) => [idOf(path), data]),
+)
