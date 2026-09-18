@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { paperMetaById } from './data/registry'
 import { immersive } from './immersive'
-import { navigateWithTransition, paperVt } from './paperTransition'
+import { flyBackToHome, paperVt } from './paperTransition'
 import { titleScrolledAway, topbarSectionLabel, topbarSectionDir, topbarSectionFast } from './topbarTitle'
 import DebugFab from './components/DebugFab.vue'
 import SettingsFab from './components/SettingsFab.vue'
@@ -37,15 +37,13 @@ watch(
 )
 
 /* 站名返回首页：论文页里带上反向共享元素过渡（标题/作者等飞回首页
-   卡片）；首页里点站本是空跳转，走 router-link 默认即可 */
+   卡片）；首页里点站本是空跳转，走链接默认行为即可 */
 function onBrandClick(e: MouseEvent) {
   if (!onPaper.value) return
   if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
   e.preventDefault()
-  navigateWithTransition(async () => {
-    paperVt.backPending = true
+  void flyBackToHome(async () => {
     await router.push('/')
-    await nextTick()
   })
 }
 

@@ -1,6 +1,6 @@
 /**
  * 论文元信息。论文正文不再使用数据接口——agent 直接用写作组件
- * （src/components/paper/）写 Vue 模板，详见 web/docs/writing-guide.md。
+ * （src/components/paper/）写 Vue 模板，详见 docs/paper-authoring.md。
  */
 export interface PaperMeta {
   /** arXiv ID，如 "2305.16264"，同时用作路由参数与文件夹名 */

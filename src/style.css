@@ -424,7 +424,13 @@ html.immersive .settings-wrap {
   gap: 28px;
   max-width: 1560px;
   margin: 0 auto;
-  /* padding: 26px 26px 80px; */
+  /* 与视口左右缘的小间距（目录贴左缘/正文贴右缘的观感）；窄屏媒体
+     查询另有自己的 padding 覆盖。padding-top 必须为 0：目录 sticky
+     的 top（64px）低于其自然位置（顶栏占位 ~47px）时全程粘住、
+     滚动零位移；一旦 padding-top 把自然位置顶过粘滞线，开始滚动的
+     头几像素目录会整体上滑。正文的顶部留白由 paper-header 的
+     margin-top 补足 */
+  padding: 0 18px 70px;
   /* 沉浸式切换：首列（目录）宽与 gap 平滑收放（列位规则见宽屏
      媒体查询） */
   transition: grid-template-columns 0.28s ease, gap 0.28s ease;
@@ -496,7 +502,8 @@ html.immersive .settings-wrap {
 
 /* ---------- 论文标题区 ---------- */
 
-.paper-header { text-align: center; margin: 14px 0 30px; }
+/* margin-top 补 layout 不设 padding-top 的顶部留白（见 .paper-layout 注释） */
+.paper-header { text-align: center; margin: 32px 0 30px; }
 .paper-header h1 {
   font-size: 26px;
   font-weight: 700;
@@ -508,40 +515,22 @@ html.immersive .settings-wrap {
 .paper-header .venue { font-size: 13.5px; color: var(--muted); margin-top: 4px; }
 .paper-header .venue a { margin-left: 8px; }
 
-/* 首页卡片 ⇄ 论文页头部的共享元素过渡（View Transitions API）：论文页
-   头部常驻过渡名作落点；首页卡片同名由 paperTransition.ts 在点击/
-   回程时动态打标（名字须全页唯一，不能静态标在所有卡片上）。
-   节奏设计：组盒（位置/尺寸飞移）0.5s 缓出，依次错开 30ms 接力；
-   旧快照 0.15s 快速淡出、新快照延迟到飞行后半程才淡入——读作「元素
-   飞过去落定」，而非两份文字长期叠影交叉淡化（默认等长交叉淡化的观感） */
-.paper-header h1 { view-transition-name: vt-title-en; }
-.paper-header .zh-title { view-transition-name: vt-title-zh; }
-.paper-header .authors { view-transition-name: vt-authors; }
-.paper-header .venue { view-transition-name: vt-venue; }
-::view-transition-group(vt-title-en),
-::view-transition-group(vt-title-zh),
-::view-transition-group(vt-authors),
-::view-transition-group(vt-venue) {
-  animation-duration: 0.5s;
-  animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+/* 首页卡片 ⇄ 论文页头部的共享元素过渡：自管飞移层（paperTransition.ts，
+   WAAPI 驱动，详见该文件头注释）。层本身只做定位/隔离，几何与排版全部
+   由脚本按帧插值；contain 防止小层内的每帧重排扩散到正文 */
+.paper-fly-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  contain: layout style;
 }
-::view-transition-group(vt-title-zh) { animation-delay: 0.03s; }
-::view-transition-group(vt-authors) { animation-delay: 0.06s; }
-::view-transition-group(vt-venue) { animation-delay: 0.09s; }
-::view-transition-old(vt-title-en),
-::view-transition-old(vt-title-zh),
-::view-transition-old(vt-authors),
-::view-transition-old(vt-venue) {
-  animation-duration: 0.15s;
-  animation-timing-function: ease-out;
-}
-::view-transition-new(vt-title-en),
-::view-transition-new(vt-title-zh),
-::view-transition-new(vt-authors),
-::view-transition-new(vt-venue) {
-  animation-delay: 0.14s;
-  animation-duration: 0.34s;
-  animation-timing-function: ease-in-out;
+/* 飞移导航时新页面主体的入场：轻微淡入，衔接「标题飞走 → 新页浮现」
+   的叙事，作者/出处等不飞的内容也借此自然出现（.fly-nav 由
+   paperTransition.ts 在飞移期间挂在 html 上） */
+.fly-nav .home, .fly-nav .paper-layout { animation: fly-page-in 0.24s ease-out; }
+@keyframes fly-page-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ---------- 双栏对照行 ---------- */

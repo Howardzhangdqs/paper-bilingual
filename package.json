@@ -10,7 +10,6 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "gen:toc": "node scripts/gen_toc.mjs",
-    "tex2blocks": "python3 scripts/tex2blocks.py",
     "figs": "python3 scripts/convert_figs.py"
   },
   "dependencies": {

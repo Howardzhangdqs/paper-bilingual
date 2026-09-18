@@ -50,7 +50,7 @@ const fixedSize = ref<{ w: number; h: number } | null>(null)
 
 /** scale=1、translate=0 时图片的布局位置与尺寸 */
 let base = { left: 0, top: 0, w: 1, h: 1 }
-let idleTimer: number | undefined
+let idleTimer: ReturnType<typeof setTimeout> | undefined
 
 function markActivity(ms = 260) {
   compositing.value = true

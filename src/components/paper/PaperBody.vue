@@ -13,6 +13,7 @@ import { Icon } from '@iconify/vue'
 import type { PaperMeta, TocEntry } from '../../types'
 import { immersive } from '../../immersive'
 import { settings } from '../../settings'
+import { paperVt } from '../../paperTransition'
 import { paperTocById } from '../../data/registry'
 import RichText from '../RichText'
 import { makeRenderCtx, provideLazyMount, providePaper, useToc } from './registry'
@@ -85,6 +86,9 @@ const mountedCount = ref(MOUNT_INITIAL)
 const sentinelEl = ref<HTMLElement>()
 
 function mountMore(n: number) {
+  /* 飞移动画进行中：本批跳过。章节挂载（含 KaTeX 渲染）是同步长任务，
+     会把标题飞移的主线程插值帧挤掉——动画期间暂避，空闲泵稍后补上 */
+  if (paperVt.flying) return
   const total = children.value.length
   if (mountedCount.value < total) mountedCount.value = Math.min(total, mountedCount.value + n)
 }
@@ -249,6 +253,7 @@ onMounted(() => {
     mountIO.observe(sentinel)
   }
   // 空闲补挂：小批推进直至全文挂载完成，编号/目录/交叉引用快速收敛。
+  // 飞移动画期间 mountMore 自行暂避，泵保持调度、动画一结束即恢复。
   // 图片保持 loading="lazy" 按视口加载（跳转前由 scroll.ts 预加载兜底）
   const pump = () => {
     if (mountedCount.value >= children.value.length) return

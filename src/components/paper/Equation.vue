@@ -12,7 +12,7 @@
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { renderTexCached } from './texCache'
-import { useDerived, useRegister } from './registry'
+import { useDerived, usePaperData, useRegister } from './registry'
 import { applyTips } from './tips'
 
 const props = withDefaults(
@@ -34,6 +34,7 @@ const item = useRegister({
   tips: props.tips,
 })
 const derived = useDerived()
+const { data } = usePaperData()
 
 /** 本公式所在连续组（单条公式自成一组）与组首判定 */
 const group = computed(() => {
@@ -43,7 +44,7 @@ const group = computed(() => {
 
 function renderTex(tex: string, display = false): string {
   try {
-    return renderTexCached(tex, 'block', { display })
+    return renderTexCached(tex, 'block', { display, macros: data.macros })
   } catch {
     return `<code class="math-error">${tex.replace(/</g, '&lt;')}</code>`
   }
