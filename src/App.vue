@@ -6,7 +6,6 @@ import { paperMetaById } from './data/registry'
 import { immersive } from './immersive'
 import { flyBackToHome, paperVt } from './paperTransition'
 import { titleScrolledAway, topbarSectionLabel, topbarSectionDir, topbarSectionFast } from './topbarTitle'
-import DebugFab from './components/DebugFab.vue'
 import SettingsFab from './components/SettingsFab.vue'
 
 const route = useRoute()
@@ -88,5 +87,4 @@ watchEffect(() => {
   </header>
   <router-view />
   <SettingsFab />
-  <DebugFab />
 </template>

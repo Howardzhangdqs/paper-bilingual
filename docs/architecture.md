@@ -68,7 +68,6 @@
 | [RichText.ts](../src/components/RichText.ts) | 函数式组件：一段文本 + 可选 RenderCtx → richtext 渲染（题注、作者、文献条目等纯字符串场景用） |
 | [rasterCache.ts](../src/components/rasterCache.ts) | 同名 `.png` 位图替身的全局探测/解码缓存（Figure 预热、Lightbox 查询就绪） |
 | [SettingsFab.vue](../src/components/SettingsFab.vue) | 左下角阅读设置浮钮（主题/图片反色/显示语言），全页面常驻 |
-| [DebugFab.vue](../src/components/DebugFab.vue) | 触屏专用的布局调试按钮（收集视口/溢出诊断 JSON），排查结束可删 |
 
 ### 写作组件与论文运行时（src/components/paper/）
 

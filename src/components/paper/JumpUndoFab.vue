@@ -60,13 +60,6 @@ onBeforeUnmount(() => window.removeEventListener(JUMP_EVENT, onJump))
 }
 .jump-undo-fab svg { width: 14px; height: 14px; }
 
-/* 触屏设备避开右下角的调试按钮（DebugFab），抬高一层 */
-@media (hover: none) {
-  .jump-undo-fab {
-    bottom: calc(62px + env(safe-area-inset-bottom));
-  }
-}
-
 .jump-undo-enter-active,
 .jump-undo-leave-active {
   transition: opacity 0.25s, transform 0.25s;
