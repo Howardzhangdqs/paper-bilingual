@@ -14,7 +14,7 @@ function genPaperToc(): Plugin {
   const rerun = (file: string) => {
     if (!PAPERS_VUE.test(file)) return
     clearTimeout(timer) // 批量保存合并成一次生成
-    timer = setTimeout(() => spawn('node', ['scripts/gen_toc.mjs'], { stdio: 'inherit' }), 100)
+    timer = setTimeout(() => spawn(process.execPath, ['scripts/gen_toc.mjs'], { stdio: 'inherit' }), 100)
   }
   return {
     name: 'gen-paper-toc',

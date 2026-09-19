@@ -3,7 +3,7 @@
 在线阅读：<https://howardzhangdqs.github.io/paper-bilingual/>（推送
 `main` 后由 GitHub Actions 自动构建部署）。
 
-Vite + Vue3 + TS 框架：左栏英文（Times New Roman）、右栏中文逐行对照，
+Vite + Vue3 + TS 框架（bun 管理依赖与脚本）：左栏英文（Times New Roman）、右栏中文逐行对照，
 图片 / 表格 / 行间公式跨栏居中显示，KaTeX 渲染公式，左侧目录随滚动高亮，
 窄屏自动降级单栏。插图点击进入灯箱（原地飞入放大、滚轮锚点缩放、拖拽
 平移；动画用位图、静止回矢量）。
@@ -68,9 +68,9 @@ LaTeX 行内标记（`~\cite{…}`、`\autoref{…}`、`$…$` 等，由 richtex
 ## 开发与部署
 
 ```bash
-npm install
-npm run dev      # 开发
-npm run build    # 构建到 dist/（base 为相对路径，可静态部署任意子目录）
+bun install
+bun run dev      # 开发
+bun run build    # 构建到 dist/（base 为相对路径，可静态部署任意子目录）
 ```
 
 推送到 `main` 即自动构建并部署到 GitHub Pages

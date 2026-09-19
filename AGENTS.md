@@ -3,7 +3,7 @@
 论文双语对照阅读网站：左栏英文、右栏中文逐行对照，图表与行间公式
 跨栏居中，KaTeX 渲染公式，左侧目录随滚动高亮，GitHub Pages 部署。
 
-当前形态：Vite + Vue3 + TypeScript。
+当前形态：Vite + Vue3 + TypeScript，bun 管理依赖与脚本。
 
 - 无测试框架，无 linter 配置（以 `package.json` 为准）。
 - 论文内容由 agent 用「写作组件」手写 Vue 模板：一篇论文 =
@@ -28,12 +28,12 @@
 
 ## 常用命令
 
-- `npm run dev` —— 本地开发。
+- `bun run dev` —— 本地开发。
   - `predev` 钩子自动生成目录，无需手动先跑。
-- `npm run build` —— `vue-tsc` 类型检查 ＋ vite 构建。
+- `bun run build` —— `vue-tsc` 类型检查 ＋ vite 构建。
   - 改完代码必须跑；CI 也靠它把关。
-- `npm run gen:toc` —— 手动重新生成各论文的 `toc.generated.ts`。
-- `npm run figs` —— 论文图转换（`scripts/convert_figs.py`）。参数必带
+- `bun run gen:toc` —— 手动重新生成各论文的 `toc.generated.ts`。
+- `bun run figs` —— 论文图转换（`scripts/convert_figs.py`）。参数必带
   （图源目录与 `--id`，缺省会报错），完整命令见
   [docs/paper-authoring.md](docs/paper-authoring.md)。
 
@@ -78,6 +78,11 @@
 
 ## 验证习惯
 
-- 改论文内容后：本地 `npm run dev`，检查页面上红色的「未识别命令」
+- 改论文内容后：本地 `bun run dev`，检查页面上红色的「未识别命令」
   标记，以及编号与跳转是否正确。
-- 改任何代码后：跑 `npm run build`，确认类型检查与构建通过。
+- 改任何代码后：跑 `bun run build`，确认类型检查与构建通过。
+- **改动即更新文档**：行为、结构、命令或约定一旦变化，同步修订受影响
+  的文档（[README.md](README.md) 与 [docs/](docs) 下相关文档，含本文件），
+  与代码改动一并提交。
+  - 为什么：文档是后续 agent 与协作者的路标，与代码失配的文档比
+    没有文档更误导。

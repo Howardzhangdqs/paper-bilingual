@@ -49,8 +49,8 @@ src/papers/<id>/
 复制。依赖 poppler-utils 的 `pdftocairo`（缺则 `sudo apt install poppler-utils`）。
 
 ```bash
-# npm script 只是转发，参数必须带全（不带参数会因缺 --id 直接报错）
-npm run figs -- ../arxiv-translation/<id>/translated/figures --id <id>
+# bun script 只是转发，参数必须带全（不带参数会因缺 --id 直接报错）
+bun run figs -- ../arxiv-translation/<id>/translated/figures --id <id>
 # 等价写法
 python3 scripts/convert_figs.py ../arxiv-translation/<id>/translated/figures --id <id>
 # 源图更新后重转已存在文件，加 --force；输出目录可用 --out 覆盖（默认 public/figures/<id>）
@@ -62,7 +62,7 @@ Figure 组件的 `src` 写 **`.svg` 路径**（如 `figures/<id>/return_alloc.sv
 ## 4. 提取文献
 
 [extract_cites.py](../scripts/extract_cites.py) 从 `.bbl` 生成两个 JSON（没有
-npm 包装，直接 python3）：
+bun 包装，直接 python3）：
 
 ```bash
 python3 scripts/extract_cites.py ../arxiv-translation/<id>/translated/main.bbl \
@@ -185,10 +185,10 @@ import { Heading, Para, En, Zh, Equation, Bullets, Item } from '../../../compone
 `gen_toc.mjs` 扫描 sections 提取 `<Heading>` 字面量，生成
 `src/papers/<id>/toc.generated.ts`。运行时机：
 
-- `predev`/`prebuild` 自动跑（`npm run dev`、`npm run build` 前置钩子）；
+- `predev`/`prebuild` 自动跑（`bun run dev`、`bun run build` 前置钩子）；
 - dev 期间 vite 插件 `gen-paper-toc`（[vite.config.ts](../vite.config.ts)）监听
   `src/papers/**/*.vue` 变更自动重跑（防抖合并）；
-- 手动：`npm run gen:toc`。
+- 手动：`bun run gen:toc`。
 
 改了章节结构（新增/改名/调级）后，用 `git diff` 确认 `toc.generated.ts`
 已更新；该产物**提交入库**（随主包 eager 加载，进页即完整目录）。
@@ -196,7 +196,7 @@ import { Heading, Para, En, Zh, Equation, Bullets, Item } from '../../../compone
 ## 9. 验证清单
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 - 主页出现新论文卡片，进入 `/#/paper/<id>`；
@@ -206,7 +206,7 @@ npm run dev
   图表/公式/章节；公式符号悬停释义生效。
 
 ```bash
-npm run build    # vue-tsc 类型检查 + vite 构建，必须通过
+bun run build    # vue-tsc 类型检查 + vite 构建，必须通过
 ```
 
 ## 10. 上线

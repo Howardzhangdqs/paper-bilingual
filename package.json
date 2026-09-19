@@ -4,12 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/gen_toc.mjs",
+    "predev": "bun scripts/gen_toc.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/gen_toc.mjs",
+    "prebuild": "bun scripts/gen_toc.mjs",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
-    "gen:toc": "node scripts/gen_toc.mjs",
+    "gen:toc": "bun scripts/gen_toc.mjs",
     "figs": "python3 scripts/convert_figs.py"
   },
   "dependencies": {
